@@ -231,10 +231,7 @@ Private Type AdmType
     EncryptedLogin As String
 
     EncryptedUserAdminKey As String
-<<<<<<< HEAD
     EncryptedApplicationKey As String
-=======
->>>>>>> remotes/origin/main
 
     ClassError As Long                 ' Save last error number
     ClassErrorText As String           ' Save last error description
@@ -242,7 +239,7 @@ Private Type AdmType
 End Type
 Private This As AdmType
 
-'<><><><><><><><> Events <><><><><><><><><>
+'<><><><><><><><> Events <><><><><><><><><><>
 
 '-----------------
 ' The login ID of current user, default for ODBC login
@@ -493,11 +490,7 @@ Private Property Get UserAdminKey(Optional ByVal IssueNewKey As Boolean = False)
                           "Cannot generate new key if new key position if not empty"
             End If
         End If
-<<<<<<< HEAD
         This.EncryptedUserAdminKey = This.Cryptography.Encrypt(This.Cryptography.Random(12), ApplicationKey)
-=======
-        This.EncryptedUserAdminKey = This.Cryptography.Encrypt(This.Cryptography.Random(12), UserAppKey)
->>>>>>> remotes/origin/main
         ' Save application key
         With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
             If KeyIsEmpty Then
@@ -505,11 +498,7 @@ Private Property Get UserAdminKey(Optional ByVal IssueNewKey As Boolean = False)
             Else
                 .Parameters(0) = AdmKeyEnum.admUserAdminKeyNew
             End If
-<<<<<<< HEAD
             .Parameters(1) = This.EncryptedUserAdminKey
-=======
-            .Parameters(1) = This.EncryptedUserAdminKey ' This.Cryptography.Encrypt(KeyValue, UserAppKey)
->>>>>>> remotes/origin/main
             .Execute dbFailOnError + dbSeeChanges
         End With
     Else
@@ -517,11 +506,7 @@ Private Property Get UserAdminKey(Optional ByVal IssueNewKey As Boolean = False)
             This.EncryptedUserAdminKey = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey)
         End If
     End If
-<<<<<<< HEAD
     UserAdminKey = This.Cryptography.Decrypt(This.EncryptedUserAdminKey, ApplicationKey)
-=======
-    UserAdminKey = This.Cryptography.Decrypt(This.EncryptedUserAdminKey, UserAppKey)
->>>>>>> remotes/origin/main
 doneUserAdminKey:
     Exit Property
 errUserAdminKey:
@@ -564,20 +549,13 @@ End Sub
 
 '------------------
 ' The application key, book cipher stored withing this class
-<<<<<<< HEAD
 Private Property Get ApplicationKey(Optional IssueNewKey As Boolean = False) As String
     On Error GoTo errApplicationKey
     Dim ClearTextKey As String
-=======
-Private Property Get UserAppKey(Optional IssueNewKey As Boolean = False) As String
-    On Error GoTo errUserAppKey
-    Static KeyPattern As String
->>>>>>> remotes/origin/main
     Dim KeyList() As String
     Dim BookLength As String
     Dim i As Long
 
-<<<<<<< HEAD
     If IssueNewKey Then
         This.EncryptedApplicationKey = vbNullString
     End If
@@ -605,37 +583,6 @@ Private Property Get UserAppKey(Optional IssueNewKey As Boolean = False) As Stri
     For i = 0 To UBound(KeyList) - 1
         ClearTextKey = ClearTextKey & Mid(AppKeyBookCipher, CInt(KeyList(i)), 1)
     Next
-=======
-    If KeyPattern = vbNullString Or IssueNewKey Then
-        If IssueNewKey Then
-            KeyPattern = vbNullString
-        Else
-            KeyPattern = Nz(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admAppKeyList))
-        End If
-
-        If KeyPattern = vbNullString Then
-            ' Create a new book cipher for the application key
-            BookLength = Len(AppKeyBookCipher) - 1
-            For i = 0 To 25
-                KeyPattern = KeyPattern & This.Cryptography.RandomInt(1, BookLength) & SINGLESPACE
-            Next
-            With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
-                .Parameters(0) = AdmKeyEnum.admAppKeyList
-                .Parameters(1) = KeyPattern
-                .Execute dbFailOnError + dbSeeChanges
-            End With
-        End If
-
-        ' Decript application key from pattern
-        KeyList = Split(KeyPattern, SINGLESPACE)
-        KeyPattern = vbNullString
-        For i = 0 To UBound(KeyList) - 1
-            KeyPattern = KeyPattern & Mid(AppKeyBookCipher, CInt(KeyList(i)), 1)
-        Next
-    End If
-
-    UserAppKey = KeyPattern
->>>>>>> remotes/origin/main
 
     ApplicationKey = ClearTextKey
 
@@ -1400,11 +1347,7 @@ Public Sub UpdateDbEncription()
     ctGuestPW = GuestLogin
 
     ' Generate new application key in key table
-<<<<<<< HEAD
     ctApplicationKeyNew = ApplicationKey(IssueNewKey:=True)
-=======
-    ctApplicationKeyNew = UserAppKey(IssueNewKey:=True)
->>>>>>> remotes/origin/main
     If ctApplicationKeyNew = vbNullString Then
         Err.Raise LastErrorNumber, "UpdateUserInDb", "Failed to get new application key"
     End If
