@@ -14,7 +14,7 @@ Uses hidden table **uSysVar** to store encrypted keys.
 <<<<<<< HEAD
 The application uses the following functions **Decrypt**, **Encrypt**, **Hash**, **Random**, **RandomInt**. Supply these functions if you replace this cryptography with something else.
 =======
-he application uses the following functions **Decrypt**, **Encrypt**, **Hash**, **Random**, **RandomInt**. Supply these functions if you replace this cryptography with something else.
+The application uses the following functions **Decrypt**, **Encrypt**, **Hash**, **Random**, **RandomInt**. Supply these functions if you replace this cryptography with something else.
 >>>>>>> f73c65638377589e6fbdbcb72b7c6c9f149556cb
 
 Sample objects
