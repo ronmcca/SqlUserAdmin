@@ -1,0 +1,24 @@
+﻿<?xml version="1.0"?>
+<dataroot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <USysVar>
+    <ID>1</ID>
+  </USysVar>
+  <USysVar>
+    <ID>2</ID>
+  </USysVar>
+  <USysVar>
+    <ID>3</ID>
+  </USysVar>
+  <USysVar>
+    <ID>4</ID>
+  </USysVar>
+  <USysVar>
+    <ID>5</ID>
+  </USysVar>
+  <USysVar>
+    <ID>6</ID>
+  </USysVar>
+  <USysVar>
+    <ID>7</ID>
+  </USysVar>
+</dataroot>

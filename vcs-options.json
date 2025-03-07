@@ -1,0 +1,138 @@
+﻿{
+  "Info": {
+    "AddinVersion": "4.1.0",
+    "AccessVersion": "16.0 64-bit"
+  },
+  "Options": {
+    "ExportFolder": "",
+    "ShowDebug": false,
+    "UseFastSave": true,
+    "UseMergeBuild": false,
+    "UseGitIntegration": false,
+    "SavePrintVars": true,
+    "ExportPrintSettings": {
+      "Orientation": true,
+      "PaperSize": true,
+      "Duplex": false,
+      "PrintQuality": false,
+      "DisplayFrequency": false,
+      "Collate": false,
+      "Resolution": false,
+      "DisplayFlags": false,
+      "Color": false,
+      "Copies": false,
+      "ICMMethod": false,
+      "DefaultSource": false,
+      "Scale": false,
+      "ICMIntent": false,
+      "FormName": false,
+      "PaperLength": false,
+      "DitherType": false,
+      "MediaType": false,
+      "PaperWidth": false,
+      "TTOption": false
+    },
+    "SaveQuerySQL": true,
+    "FormatSQL": true,
+    "ForceImportOriginalQuerySQL": false,
+    "SaveTableSQL": true,
+    "SplitLayoutFromVBA": true,
+    "StripPublishOption": true,
+    "SanitizeColors": 1,
+    "SanitizeLevel": 2,
+    "ExtractThemeFiles": false,
+    "TablesToExportData": {
+      "feAccessAndJetErrors": {
+        "Format": "Tab Delimited"
+      },
+      "feAttachedTables": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesAcadE": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesArchive": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesArchivePre2010": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesGonzo": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesPT": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesPTPre2010": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesSQL": {
+        "Format": "XML Format"
+      },
+      "feAttachedTablesTemp": {
+        "Format": "XML Format"
+      },
+      "feDocumentAll": {
+        "Format": "XML Format"
+      },
+      "feDocumentForms": {
+        "Format": "XML Format"
+      },
+      "feDocumentModules": {
+        "Format": "XML Format"
+      },
+      "feDocumentQuerys": {
+        "Format": "XML Format"
+      },
+      "feDocumentReports": {
+        "Format": "XML Format"
+      },
+      "feDocumentTables": {
+        "Format": "XML Format"
+      },
+      "feNetworkCardNamePattern": {
+        "Format": "XML Format"
+      },
+      "feRevision": {
+        "Format": "XML Format"
+      },
+      "feUser": {
+        "Format": "XML Format"
+      },
+      "feVariable": {
+        "Format": "XML Format"
+      },
+      "USysRegInfo": {
+        "Format": "Tab Delimited"
+      },
+      "USysRibbons": {
+        "Format": "Tab Delimited"
+      },
+      "USysVar": {
+        "Format": "XML Format"
+      }
+    },
+    "SchemaExports": {
+      "JobCost": {
+        "Enabled": true,
+        "DatabaseType": 1,
+        "Description": "Tables shared with Autodesk",
+        "UtcDateTime": false,
+        "UseDotEnv": true,
+        "Filter": [
+        ]
+      }
+    },
+    "RunBeforeExport": "",
+    "RunAfterExport": "",
+    "RunBeforeBuild": "",
+    "RunAfterBuild": "",
+    "RunBeforeMerge": "",
+    "RunAfterMerge": "",
+    "ShowVCSLegacy": true,
+    "HashAlgorithm": "SHA256",
+    "UseShortHash": true,
+    "BreakOnError": false,
+    "PreserveRubberDuckID": false
+  }
+}

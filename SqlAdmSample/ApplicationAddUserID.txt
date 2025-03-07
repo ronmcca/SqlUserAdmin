@@ -1,0 +1,28 @@
+USE [AdmSample]
+GO
+/****** Object:  StoredProcedure [jcsm].[ApplicationAddUserID]    Script Date: 3/5/2025 1:39:07 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Ron McCarry
+-- Create date: 3-29-2023
+-- Description:	Add Application User ID
+-- =============================================
+CREATE PROCEDURE [jcsm].[ApplicationAddUserID] 
+	-- Add the parameters for the stored procedure here
+	@EncodedWinID varchar(80), 
+	@EncodedPassword varchar(252)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    INSERT INTO jcsm.UserID(WinID,AppPw)
+	VALUES (@EncodedWinID,@EncodedPassword)
+END
+
+GO

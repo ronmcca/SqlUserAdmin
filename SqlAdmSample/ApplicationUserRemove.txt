@@ -1,0 +1,37 @@
+USE [AdmSample]
+GO
+/****** Object:  StoredProcedure [jcsm].[ApplicationUserRemove]    Script Date: 3/5/2025 1:39:07 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- Batch submitted through debugger: SQLQuery4.sql|7|0|C:\Users\JcsAdm\AppData\Local\Temp\2\~vsCE80.sql
+-- =============================================
+-- Author:		Ron McCarry
+-- Create date: 4/9/24
+-- Description:	Remove user if member of the 'jcs_user' role from database
+-- =============================================
+CREATE PROCEDURE [jcsm].[ApplicationUserRemove] 
+	-- Add the parameters for the stored procedure here
+	@winID nvarchar(39) = ''
+WITH EXECUTE AS OWNER
+AS
+-- EXIST does not work on older SQL servers
+-- if exists (select IS_SRVROLEMEMBER('jcs_user',@winID)) 
+-- BEGIN	
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	DECLARE @SQL nvarchar(2000)
+
+	-- set @SQL = N'USE [AdmSample]' +
+	-- 		    'DROP USER IF EXISTS ' + @winID 
+
+	set @SQL = N'USE [AdmSample]' +
+			    'DROP USER ' + @winID 
+
+	execute(@SQL)
+-- END
+
+GO

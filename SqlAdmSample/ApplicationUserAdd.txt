@@ -1,0 +1,38 @@
+USE [AdmSample]
+GO
+/****** Object:  StoredProcedure [jcsm].[ApplicationUserAdd]    Script Date: 3/5/2025 1:39:07 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Ron McCarry
+-- Create date: 4/9/24
+-- Description:	Add User/Password with jcs_User role.
+-- =============================================
+CREATE PROCEDURE [jcsm].[ApplicationUserAdd] 
+	@winID nvarchar(39) = '', 
+	@password nvarchar(61) = ''
+WITH EXECUTE AS OWNER
+AS
+if not exists (select * from sys.database_principals where name = @winID)
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	DECLARE @SQL nvarchar(2000) 
+
+	Set @SQL = N'CREATE USER ' + @winID + ' ' +
+	            'WITH PASSWORD = ''' + @password + '''' +
+	               ', DEFAULT_SCHEMA = [dbo]'
+
+	EXECUTE (@SQL)
+	
+	Set @SQL = N'ALTER ROLE [jcs_user] ADD MEMBER ' + @winID
+
+	EXECUTE (@SQL)
+END
+
+GO

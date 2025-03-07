@@ -1,0 +1,24 @@
+USE [master]
+GO
+ALTER DATABASE [AdmSample] SET COMPATIBILITY_LEVEL = 120
+GO
+USE [AdmSample]
+GO
+/****** Object:  User [UserAdmin]    Script Date: 3/6/2025 2:03:00 PM ******/
+CREATE USER [UserAdmin] WITH PASSWORD=N'PDD/o114Y2sBn7mOVuca87gwDl/dFFHVtkM+iedkL7U=', DEFAULT_SCHEMA=[jcsm]
+GO
+/****** Object:  User [RDP]    Script Date: 3/6/2025 2:03:00 PM ******/
+CREATE USER [RDP] WITH PASSWORD=N'chF7N8QNLYydqUiUx11Tq2Vxky0H9KjSb5hL8XZQB0Q=', DEFAULT_SCHEMA=[dbo]
+GO
+/****** Object:  DatabaseRole [jcs_user]    Script Date: 3/6/2025 2:03:00 PM ******/
+CREATE ROLE [jcs_user]
+GO
+ALTER ROLE [db_datareader] ADD MEMBER [RDP]
+GO
+ALTER ROLE [db_datareader] ADD MEMBER [jcs_user]
+GO
+ALTER ROLE [db_datawriter] ADD MEMBER [jcs_user]
+GO
+/****** Object:  Schema [jcsm]    Script Date: 3/6/2025 2:03:00 PM ******/
+CREATE SCHEMA [jcsm]
+GO

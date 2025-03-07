@@ -1,0 +1,134 @@
+﻿-------------------------------------
+Beginning Export of Source Files
+SqlUserAdmin.accdb
+VCS Version 4.1.0
+Full Path: C:\PAI\Dev\SqlUserAdmin\SqlUserAdmin.accdb
+Export Folder: C:\PAI\Dev\SqlUserAdmin\SqlUserAdmin.accdb.src\
+Using Fast Save
+3/6/25 3:34:06 PM
+-------------------------------------
+Scanning external databases...
+ - JobCost
+   No connection string found. (.env)
+
+-------------------------------------
+WARNING: File not found: 
+Source: modImportExport.ExportSchemas
+-------------------------------------
+Set the connection string for this external database connection in VCS options to automatically create this file.
+(This file may contain authentication credentials and should be excluded from version control.)
+-------------------------------------
+Scanning for changes...
+No modified db connections found in this database.
+No modified project found in this database.
+No modified vb project found in this database.
+No modified vbe references found in this database.
+No modified vbe forms found in this database.
+No modified proj properties found in this database.
+No modified saved specs found in this database.
+No modified commandbars found in this database.
+No modified shared images found in this database.
+No modified themes found in this database.
+No modified db properties found in this database.
+No modified imex specs found in this database.
+No modified tables found in this database.
+No modified queries found in this database.
+No modified macros found in this database.
+No modified reports found in this database.
+No modified table data macros found in this database.
+No modified relations found in this database.
+No modified doc properties found in this database.
+No modified nav pane groups found in this database.
+No modified hidden attributes found in this database.
+-------------------------------------
+Exporting modules...          
+  ClassAdm
+[1]
+-------------------------------------
+Exporting forms...            
+  A
+    Sanitized in 0.006 seconds.
+  MainMenu
+    Sanitized in 0.005 seconds.
+[2]
+-------------------------------------
+Exporting table data...       
+  feUser
+    Sanitized in 0.001 seconds.
+  USysVar
+    Sanitized in 0.001 seconds.
+[2]
+-------------------------------------
+Done. (2.01 seconds)
+
+--------------------------------------------------
+                PERFORMANCE REPORTS
+--------------------------------------------------
+Category                      Count     Seconds
+--------------------------------------------------
+Forms                         2         1.38
+DB Properties                 0         0.14
+Table Data                    2         0.08
+Modules                       1         0.06
+Nav Pane Groups               0         0.03
+DB Connections                0         0.03
+VBE References                0         0.02
+Doc Properties                0         0.02
+CommandBars                   0         0.02
+Tables                        0         0.01
+Hidden Attributes             0         0.01
+Proj Properties               0         0.01
+Themes                        0         0.01
+VB Project                    0         0.01
+Project                       0         0.01
+Shared Images                 0         0.00
+Table Data Macros             0         0.00
+Relations                     0         0.00
+IMEX Specs                    0         0.00
+VBE Forms                     0         0.00
+Saved Specs                   0         0.00
+Reports                       0         0.00
+Queries                       0         0.00
+Macros                        0         0.00
+--------------------------------------------------
+TOTALS:                       5         1.86
+--------------------------------------------------
+
+--------------------------------------------------
+Operations                    Count     Seconds
+--------------------------------------------------
+Convert to JSON               617       0.25
+Scan DB Objects               1         0.11
+Increment Progress            27        0.05
+App.ExportXML()               2         0.05
+Console Updates               4         0.04
+Clear Orphaned Files          14        0.04
+App.SaveAsText()              2         0.02
+Sanitize File                 2         0.01
+Export VBE Module             1         0.01
+Get VBA Hash                  7         0.01
+Quick Count Files             1         0.01
+Write File                    7         0.00
+Get File Property Hash        6         0.00
+Compute SHA256                37        0.00
+Read File DevMode             2         0.00
+Quick Count Objects           1         0.00
+Parse JSON                    1         0.00
+Delete File                   8         0.00
+Check for linked table        6         0.00
+Sanitize VBA Code             3         0.00
+modFileAccess.VerifyPath      11        0.00
+Read File                     6         0.00
+Read File Bytes               5         0.00
+Sanitize XML                  2         0.00
+Scan External Databases       1         0.00
+Parse JSON ISO Date           36        0.00
+Close Open Objects            1         0.00
+Get Modified Date             6         0.00
+Format XML                    2         0.00
+modFileAccess.GetUncPath      2         0.00
+--------------------------------------------------
+Other Operations                        1.37
+--------------------------------------------------
+
+
