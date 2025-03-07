@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "2025-03-04T20:05:13.000Z",
-    "ExportDate": "2025-03-06T21:34:08.000Z",
+    "ExportDate": "2025-03-07T18:22:59.000Z",
     "FullExportDate": "2025-03-04T20:00:47.000Z",
     "OptionsHash": "f7c78cc",
     "LastMergedCommit": "",
@@ -40,19 +40,19 @@
       "Forms": {
         "A.bas": {
           "FileHash": "6e06019",
-          "ExportDate": "2025-03-06T21:34:08.000Z",
+          "ExportDate": "2025-03-07T18:22:56.000Z",
           "SourceModified": null,
-          "FilePropertiesHash": "dd4cd78",
+          "FilePropertiesHash": "b54f170",
           "ImportDate": "2025-03-04T20:05:11.000Z",
-          "OtherHash": "fc4d04c"
+          "OtherHash": "a235d3b"
         },
         "MainMenu.bas": {
           "FileHash": "56c371f",
-          "ExportDate": "2025-03-06T21:34:08.000Z",
+          "ExportDate": "2025-03-07T18:22:56.000Z",
           "SourceModified": null,
-          "FilePropertiesHash": "52d2b4e",
+          "FilePropertiesHash": "553ddc2",
           "ImportDate": "2025-03-04T20:05:11.000Z",
-          "OtherHash": "86b3502"
+          "OtherHash": "e9c4929"
         },
         "UserList.bas": {
           "FileHash": "bd33a45",
@@ -69,20 +69,20 @@
       },
       "Modules": {
         "ClassAdm.cls": {
-          "FileHash": "1da00dc",
-          "ExportDate": "2025-03-06T21:34:06.000Z",
+          "FileHash": "346695c",
+          "ExportDate": "2025-03-07T18:22:55.000Z",
           "SourceModified": null,
-          "FilePropertiesHash": "3109264",
+          "FilePropertiesHash": "23a4c4c",
           "ImportDate": "2025-03-04T20:05:10.000Z",
-          "OtherHash": "71c3413"
+          "OtherHash": "3f5a769"
         },
         "ClassCrypt.cls": {
-          "FileHash": "2856744",
-          "ExportDate": "2025-03-04T20:08:36.000Z",
+          "FileHash": "ea45492",
+          "ExportDate": "2025-03-07T18:22:55.000Z",
           "SourceModified": null,
-          "FilePropertiesHash": "c5cc9f4",
+          "FilePropertiesHash": "7950e20",
           "ImportDate": "2025-03-04T20:05:10.000Z",
-          "OtherHash": "69c1ccb"
+          "OtherHash": "637cd9c"
         },
         "modLog.bas": {
           "FileHash": "2bab8a6",
