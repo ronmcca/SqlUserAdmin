@@ -30,6 +30,7 @@ Sample objects
 **Form_MainMenu** and **Form_UserList** are sample form/sub-form for working with the database.
 
 <<<<<<< HEAD
-I am using the **Joyfullservice** version control systems to generate these objects. It can be used to build the accdb from source. Check out the repository at https://github.com/joyfullservice/msaccess-vcs-addin
+I am using the **Joyfullservice** version control systems to generate these objects. 
+It can be used to build the accdb from source. Check out the repository at https://github.com/joyfullservice/msaccess-vcs-addin
 =======
 >>>>>>> f73c65638377589e6fbdbcb72b7c6c9f149556cb
