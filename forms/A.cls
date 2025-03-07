@@ -99,45 +99,45 @@ End Sub
 
 '------------------
 ' Return the current user's login ID
-Private Sub clsAdm_LoginUserID(ByRef UserID)
+Private Sub clsAdm_LoginUserID(ByRef ClearTextUserID As String)
     Dim LogInShortName As String
     Dim LngLen As Long
     LogInShortName = String$(254, 0)
     LngLen = 255
     If apiGetUserName(LogInShortName, LngLen) > 0 Then
-        UserID = Trim$(left$(LogInShortName, LngLen - 1))
+        ClearTextUserID = Trim$(left$(LogInShortName, LngLen - 1))
     End If
 End Sub
 '---------------------------
 ' Event to return User ID to ClassADM
 ' Pre-Open recordset with list of users
 ' Returns next selected user, vbNullString at end of list
-Private Sub clsAdm_NextUserID(ByRef UserID As String)
+Private Sub clsAdm_NextUserID(ByRef ClearTextUserID As String)
     On Error GoTo errclsAdm_NextUserID
 
     If Not This.rsUserList.EOF Then
-        UserID = Trim(Nz(This.rsUserList![UserID]))
+        ClearTextUserID = Trim(Nz(This.rsUserList![UserID]))
         This.rsUserList.MoveNext
     Else
-        UserID = vbNullString
+        ClearTextUserID = vbNullString
     End If
 
 doneclsAdm_NextUserID:
     Exit Sub
 errclsAdm_NextUserID:
     LogMessage "clsAdm_NextUserID"
-    UserID = vbNullString
+    ClearTextUserID = vbNullString
     Resume doneclsAdm_NextUserID
 End Sub
 '--------------------------------
 ' In Production Check Active Directory for User ID
-Private Sub clsAdm_VerifyUserID(ByVal UserID As String, _
+Private Sub clsAdm_VerifyUserID(ByVal ClearTextUserID As String, _
                                 ByRef Response As Boolean)
     Response = True
 End Sub
 '--------------------------------
 ' In Production Check Active Directory for user in group
-Private Sub clsAdm_VerifyUserInGroup(ByVal UserID As String, _
+Private Sub clsAdm_VerifyUserInGroup(ByVal ClearTextUserID As String, _
                                      ByVal AccessType As AdmUserTypeEnum, _
                                      ByRef Response As Boolean)
     Response = True

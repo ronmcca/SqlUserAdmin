@@ -131,10 +131,11 @@ Private Const ModuleName As String = "ClassAdm"
 '
 '---------------------------------------------------------------------------------
 
-Private Const adVarChar As Long = 200   ' ADODB.DataTypeEnum.adVarChar from 'Active DS Type Library
-Private Const adInteger As Long = 3     ' ADODB.DataTypeEnum.adInteger from 'Active DS Type Library
-Private Const adParamInput As Long = 1  ' ADODB.ParameterDirectionEnum.adParamInput from 'Active DS Type Library
-Private Const adParamOutput As Long = 2 ' ADODB.ParameterDirectionEnum.adParamOutput from 'Active DS Type Library
+' Constants referencing 'Active DS Type Library
+Private Const admVarChar As Long = 200   ' ADODB.DataTypeEnum.adVarChar
+Private Const admInteger As Long = 3     ' ADODB.DataTypeEnum.adInteger
+Private Const admParamInput As Long = 1  ' ADODB.ParameterDirectionEnum.adParamInput
+Private Const admParamOutput As Long = 2 ' ADODB.ParameterDirectionEnum.adParamOutput
 
 Private Const ALPHABETICCHARACTERS As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 Private Const NUMERICCHARACTERS As String = "0123456789"
@@ -148,12 +149,11 @@ Private Const PASSWORDCHARACTERS As String = NUMERICCHARACTERS & _
                                              "abcdefghijklmnopqrstuvwxyz" & _
                                              PASSWORDSPECIALCHAR
 
-Private Const HashAlgorithem As Long = 6 ' From ClassCrypt, cBcHashAlgorithm.bcSha384
+Private Const HashAlgorithem As Long = 6 ' From ClassCrypt, BcHashAlgorithm.bcSha384
 
 ' USysVar row ID for application keys
 Private Enum AdmKeyEnum
     admUserAdminKey = 1
-    admUserAdminKeyNew = 2
     admUserAdminID = 3
     admUserAdminPW = 4
     admGuestID = 5
@@ -201,8 +201,8 @@ End Enum
 
 '----------
 ' Query string used to update keys ins usysvar
-Private Const QryUpdateUSysVar As String = "PARAMETERS [KeyType] Long, [KeyValue] Value; " & _
-                                           "UPDATE usysvar SET usysvar.[sValue] = [KeyValue] " & _
+Private Const QryUpdateUSysVar As String = "PARAMETERS [KeyType] Long, [ctKeyValue] Value; " & _
+                                           "UPDATE usysvar SET usysvar.[sValue] = [ctKeyValue] " & _
                                            "WHERE usysvar.[ID]=[KeyType]"
 ' Instance varables
 Private Type AdmType
@@ -228,7 +228,7 @@ Private Type AdmType
     EncryptedUserAdminID As String
     EncryptedUserAdminLogin As String
     EncryptedGuestID As String
-    EncryptedLogin As String
+    EncryptedGuestLogin As String
 
     EncryptedUserAdminKey As String
     EncryptedApplicationKey As String
@@ -243,18 +243,18 @@ Private This As AdmType
 
 '-----------------
 ' The login ID of current user, default for ODBC login
-Public Event LoginUserID(ByRef UserID)
+Public Event LoginUserID(ByRef ClearTextUserID As String)
 '-----------------
 ' Next userID to update, vbNullString when done
-Public Event NextUserID(ByRef UserID As String)
+Public Event NextUserID(ByRef ClearTextUserID As String)
 '----------
 ' Check user ID is configured
 ' Normaly check Active Directory users
-Public Event VerifyUserID(ByVal UserID As String, _
+Public Event VerifyUserID(ByVal ClearTextUserID As String, _
                           ByRef Resonse As Boolean)
 '---------
 ' Check if User is in application group
-Public Event VerifyUserInGroup(ByVal UserID As String, _
+Public Event VerifyUserInGroup(ByVal ClearTextUserID As String, _
                                ByVal AccessType As AdmUserTypeEnum, _
                                ByRef Resonse As Boolean)
 ' Provide SQL server connection string information
@@ -304,10 +304,10 @@ Private Property Let ODBCLogInName(ByVal Value As String)
     On Error Resume Next
     This.ODBCLogInName = Value
 End Property
-Private Property Get UserID() As String
+Private Property Get ctLoginUserID() As String
     Dim Response As String
     RaiseEvent LoginUserID(Response)
-    UserID = Response
+    ctLoginUserID = Response
 End Property
 Private Property Get ODBCDriver() As String
     If This.DriverODBC = vbNullString Then
@@ -386,8 +386,8 @@ Private Function ADODBConnectString() As String
                          ";DATABASE=" & DatabaseName & _
                          ";Trusted_Connection=" & TrustedConnection & _
                          ";Encrypt=" & EncryptSQL & _
-                         ";UID=" & UserAdminID & _
-                         ";PWD=" & UserAdminLogin
+                         ";UID=" & ctUserAdminID & _
+                         ";PWD=" & ctUserAdminLogin
 doneADODBConnectString:
     Exit Function
 errADODBConnectString:
@@ -398,79 +398,79 @@ End Function
 
 '----------------
 ' Login ID of read only guest user
-Private Property Get GuestID(Optional ByVal ReturnDecripted As Boolean = True) As String
-    On Error GoTo errGuestID
+Private Property Get ctGuestLoginID(Optional ByVal ReturnDecripted As Boolean = True) As String
+    On Error GoTo errctGuestLoginID
     If This.EncryptedGuestID = vbNullString Then
         This.EncryptedGuestID = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admGuestID)
     End If
     If ReturnDecripted Then
-        GuestID = This.Cryptography.Decrypt(This.EncryptedGuestID, UserAdminKey)
+        ctGuestLoginID = This.Cryptography.Decrypt(This.EncryptedGuestID, ctUserAdminKey)
     Else
-        GuestID = This.EncryptedGuestID
+        ctGuestLoginID = This.EncryptedGuestID
     End If
-doneGuestID:
+donectGuestLoginID:
     Exit Property
-errGuestID:
-    LogMessage "GuestID"
-    GuestID = vbNullString
-    Resume doneGuestID
+errctGuestLoginID:
+    LogMessage "ctGuestLoginID"
+    ctGuestLoginID = vbNullString
+    Resume donectGuestLoginID
 End Property
 '--------
 ' Login password of read only guest user
-Private Property Get GuestLogin(Optional ByVal ReturnDecripted As Boolean = True) As String
-    On Error GoTo errGuestLogin
-    If This.EncryptedLogin = vbNullString Then
-        This.EncryptedLogin = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admGuestLogin)
+Private Property Get ctGuestLogin(Optional ByVal ReturnDecripted As Boolean = True) As String
+    On Error GoTo errctGuestLogin
+    If This.EncryptedGuestLogin = vbNullString Then
+        This.EncryptedGuestLogin = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admGuestLogin)
     End If
     If ReturnDecripted Then
-        GuestLogin = This.Cryptography.Decrypt(This.EncryptedLogin, UserAdminKey)
+        ctGuestLogin = This.Cryptography.Decrypt(This.EncryptedGuestLogin, ctUserAdminKey)
     Else
-        GuestLogin = This.EncryptedLogin
+        ctGuestLogin = This.EncryptedGuestLogin
     End If
-doneGuestLogin:
+donectGuestLogin:
     Exit Property
-errGuestLogin:
-    LogMessage "GuestLogin"
-    GuestLogin = vbNullString
-    Resume doneGuestLogin
+errctGuestLogin:
+    LogMessage "ctGuestLogin"
+    ctGuestLogin = vbNullString
+    Resume donectGuestLogin
 End Property
 '--------------
 ' Login in ID of user administrator account
-Private Property Get UserAdminID(Optional ByVal ReturnDecripted As Boolean = True) As String
-    On Error GoTo errUserAdminID
+Private Property Get ctUserAdminID(Optional ByVal ReturnDecripted As Boolean = True) As String
+    On Error GoTo errctUserAdminID
     If This.EncryptedUserAdminID = vbNullString Then
         This.EncryptedUserAdminID = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminID)
     End If
     If ReturnDecripted Then
-        UserAdminID = This.Cryptography.Decrypt(This.EncryptedUserAdminID, UserAdminKey)
+        ctUserAdminID = This.Cryptography.Decrypt(This.EncryptedUserAdminID, ctUserAdminKey)
     Else
-        UserAdminID = This.EncryptedUserAdminID
+        ctUserAdminID = This.EncryptedUserAdminID
     End If
-doneUserAdminID:
+donectUserAdminID:
     Exit Property
-errUserAdminID:
-    LogMessage "UserAdminID"
-    UserAdminID = vbNullString
-    Resume doneUserAdminID
+errctUserAdminID:
+    LogMessage "ctUserAdminID"
+    ctUserAdminID = vbNullString
+    Resume donectUserAdminID
 End Property
 '--------
 ' Login password of user administrator account
-Private Property Get UserAdminLogin(Optional ByVal ReturnDecripted As Boolean = True) As String
-    On Error GoTo errUserAdminLogin
+Private Property Get ctUserAdminLogin(Optional ByVal ReturnDecripted As Boolean = True) As String
+    On Error GoTo errctUserAdminLogin
     If This.EncryptedUserAdminLogin = vbNullString Then
         This.EncryptedUserAdminLogin = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminPW)
     End If
     If ReturnDecripted Then
-        UserAdminLogin = This.Cryptography.Decrypt(This.EncryptedUserAdminLogin, UserAdminKey)
+        ctUserAdminLogin = This.Cryptography.Decrypt(This.EncryptedUserAdminLogin, ctUserAdminKey)
     Else
-        UserAdminLogin = This.EncryptedUserAdminLogin
+        ctUserAdminLogin = This.EncryptedUserAdminLogin
     End If
-doneUserAdminLogin:
+donectUserAdminLogin:
     Exit Property
-errUserAdminLogin:
-    LogMessage "UserAdminLogin"
-    UserAdminLogin = vbNullString
-    Resume doneUserAdminLogin
+errctUserAdminLogin:
+    LogMessage "ctUserAdminLogin"
+    ctUserAdminLogin = vbNullString
+    Resume donectUserAdminLogin
 End Property
 
 '------------------------------------------
@@ -478,126 +478,86 @@ End Property
 ' issueNewKey If true generate new key and return that
 '             If current key is null, fill current key
 '             else fill new key
-Private Property Get UserAdminKey(Optional ByVal IssueNewKey As Boolean = False) As String
-    On Error GoTo errUserAdminKey
-    Dim KeyIsEmpty As Boolean
+Private Property Get ctUserAdminKey(Optional ByVal IssueNewKey As Boolean = False) As String
+    On Error GoTo errctUserAdminKey
+    Dim CurrentKeyIsEmpty As Boolean
 
     If IssueNewKey Then
-        KeyIsEmpty = IsNull(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey))
-        If Not KeyIsEmpty Then
-            If Not IsNull(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKeyNew)) Then
-                Err.Raise AdmErrorEnum.ObjectError, "UserAdminKey", _
-                          "Cannot generate new key if new key position if not empty"
-            End If
-        End If
-        This.EncryptedUserAdminKey = This.Cryptography.Encrypt(This.Cryptography.Random(12), ApplicationKey)
-        ' Save application key
+        This.EncryptedUserAdminKey = vbNullString
+    Else
+        This.EncryptedUserAdminKey = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey)
+    End If
+
+    If This.EncryptedUserAdminKey = vbNullString Then
+        This.EncryptedUserAdminKey = This.Cryptography.Encrypt(This.Cryptography.Random(12), ctApplicationKey)
         With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
-            If KeyIsEmpty Then
-                .Parameters(0) = AdmKeyEnum.admUserAdminKey
-            Else
-                .Parameters(0) = AdmKeyEnum.admUserAdminKeyNew
-            End If
+            .Parameters(0) = AdmKeyEnum.admUserAdminKey
             .Parameters(1) = This.EncryptedUserAdminKey
             .Execute dbFailOnError + dbSeeChanges
         End With
-    Else
-        If This.EncryptedUserAdminKey = vbNullString Then
-            This.EncryptedUserAdminKey = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey)
-        End If
     End If
-    UserAdminKey = This.Cryptography.Decrypt(This.EncryptedUserAdminKey, ApplicationKey)
-doneUserAdminKey:
+
+    ctUserAdminKey = This.Cryptography.Decrypt(This.EncryptedUserAdminKey, ctApplicationKey)
+
+donectUserAdminKey:
     Exit Property
-errUserAdminKey:
-    LogMessage "UserAdminKey"
-    UserAdminKey = vbNullString
-    Resume doneUserAdminKey
+errctUserAdminKey:
+    LogMessage "ctUserAdminKey"
+    ctUserAdminKey = vbNullString
+    Resume donectUserAdminKey
 End Property
 
-'--------------------
-' Move new key to current key then null new key
-Private Sub UserAdminKeyFinishReplacement()
-    On Error GoTo errUserAdminKeyFinishReplacement
-    Dim EncryptedNewKey As String
-
-    EncryptedNewKey = Nz(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKeyNew))
-
-    If EncryptedNewKey <> vbNullString Then
-        With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
-            ' Save new key to active key
-            .Parameters(0) = AdmKeyEnum.admUserAdminKey
-            .Parameters(1) = EncryptedNewKey
-            .Execute dbFailOnError + dbSeeChanges
-
-            ' Delete saved new key
-            .Parameters(0) = AdmKeyEnum.admUserAdminKeyNew
-            .Parameters(1) = Null
-            .Execute dbFailOnError + dbSeeChanges
-        End With
-    Else
-        Err.Raise AdmErrorEnum.MissingInfo, _
-                  "UserAdminKeyFinishReplacement", _
-                  "Need new user admin key"
-    End If
-doneUserAdminKeyFinishReplacement:
-    Exit Sub
-errUserAdminKeyFinishReplacement:
-    LogMessage "UserAdminKeyFinishReplacement"
-    Resume doneUserAdminKeyFinishReplacement
-End Sub
-
 '------------------
+' Return clear text application key
 ' The application key, book cipher stored withing this class
-Private Property Get ApplicationKey(Optional IssueNewKey As Boolean = False) As String
-    On Error GoTo errApplicationKey
-    Dim ClearTextKey As String
+Private Property Get ctApplicationKey(Optional IssueNewKey As Boolean = False) As String
+    On Error GoTo errctApplicationKey
+    Dim ctDecriptedKey As String
     Dim KeyList() As String
     Dim BookLength As String
     Dim i As Long
 
     If IssueNewKey Then
         This.EncryptedApplicationKey = vbNullString
+    Else
+        This.EncryptedApplicationKey = Nz(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admAppKeyList))
     End If
 
     If This.EncryptedApplicationKey = vbNullString Then
-        This.EncryptedApplicationKey = Nz(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admAppKeyList))
-        If This.EncryptedApplicationKey = vbNullString Then
-            ' Create a new key using book cipher
-            BookLength = Len(AppKeyBookCipher) - 1
-            For i = 0 To 25
-                This.EncryptedApplicationKey = This.EncryptedApplicationKey & _
-                                               This.Cryptography.RandomInt(1, BookLength) & SINGLESPACE
-            Next
-            With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
-                .Parameters(0) = AdmKeyEnum.admAppKeyList
-                .Parameters(1) = This.EncryptedApplicationKey
-                .Execute dbFailOnError + dbSeeChanges
-            End With
-        End If
+        ' Create a new key using book cipher
+        BookLength = Len(AppKeyBookCipher) - 1
+        For i = 0 To 25
+            This.EncryptedApplicationKey = This.EncryptedApplicationKey & _
+                                           This.Cryptography.RandomInt(1, BookLength) & SINGLESPACE
+        Next
+        With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
+            .Parameters(0) = AdmKeyEnum.admAppKeyList
+            .Parameters(1) = This.EncryptedApplicationKey
+            .Execute dbFailOnError + dbSeeChanges
+        End With
     End If
 
     ' Decript application key
     KeyList = Split(This.EncryptedApplicationKey, SINGLESPACE)
-    ClearTextKey = vbNullString
+    ctDecriptedKey = vbNullString
     For i = 0 To UBound(KeyList) - 1
-        ClearTextKey = ClearTextKey & Mid(AppKeyBookCipher, CInt(KeyList(i)), 1)
+        ctDecriptedKey = ctDecriptedKey & Mid(AppKeyBookCipher, CInt(KeyList(i)), 1)
     Next
 
-    ApplicationKey = ClearTextKey
+    ctApplicationKey = ctDecriptedKey
 
-doneApplicationKey:
+donectApplicationKey:
     Exit Property
-errApplicationKey:
-    LogMessage "ApplicationKey"
-    Resume doneApplicationKey
+errctApplicationKey:
+    LogMessage "ctApplicationKey"
+    Resume donectApplicationKey
 End Property
 
 '------------------------------------------------------------------------------
 ' Use ADODB and stored procedure to add user ID to SQL server application table
 ' Note: The user account is NOT added to the database
-Private Sub AddEncryptedUserInfo(ByVal encryptedWinID As String, _
-                                 ByVal encryptedPassword As String)
+Private Sub AddEncryptedUserInfo(ByVal ecWinID As String, _
+                                 ByVal ecPassword As String)
     On Error GoTo errAddEncryptedUserInfo
 
     Dim cmdSql As ADODB.Command
@@ -610,13 +570,13 @@ Private Sub AddEncryptedUserInfo(ByVal encryptedWinID As String, _
     cmdSql.CommandType = adCmdStoredProc
     cmdSql.CommandText = DatabaseName & ".[jcsm].[ApplicationAddUserID]"
 
-    Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", adVarChar, adParamInput, 80)
-    ParamIn.Value = encryptedWinID
+    Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", admVarChar, admParamInput, 80)
+    ParamIn.Value = ecWinID
     cmdSql.Parameters.Append ParamIn
     Set ParamIn = Nothing
 
-    Set ParamIn = cmdSql.CreateParameter("@EncodedPassword", adVarChar, adParamInput, 252)
-    ParamIn.Value = encryptedPassword
+    Set ParamIn = cmdSql.CreateParameter("@EncodedPassword", admVarChar, admParamInput, 252)
+    ParamIn.Value = ecPassword
     cmdSql.Parameters.Append ParamIn
     Set ParamIn = Nothing
 
@@ -633,8 +593,8 @@ End Sub
 
 '------------------------------------------------------------------------------
 ' Use ADODB and stored procedure to add user account to database
-Private Sub AddUserToDB(ByVal clearTextWinIdUpperCase As String, _
-                        ByVal ClearTextPassword As String)
+Private Sub AddUserToDB(ByVal ctWinIdUpperCase As String, _
+                        ByVal ctPassword As String)
     On Error GoTo errAddUserToDB
 
     Dim cmdSql As ADODB.Command
@@ -647,13 +607,13 @@ Private Sub AddUserToDB(ByVal clearTextWinIdUpperCase As String, _
     cmdSql.CommandType = adCmdStoredProc
     cmdSql.CommandText = DatabaseName & ".[jcsm].[ApplicationUserAdd]"
 
-    Set ParamIn = cmdSql.CreateParameter("@winID", adVarChar, adParamInput, 39)
-    ParamIn.Value = clearTextWinIdUpperCase
+    Set ParamIn = cmdSql.CreateParameter("@winID", admVarChar, admParamInput, 39)
+    ParamIn.Value = ctWinIdUpperCase
     cmdSql.Parameters.Append ParamIn
     Set ParamIn = Nothing
 
-    Set ParamIn = cmdSql.CreateParameter("@password", adVarChar, adParamInput, 61)
-    ParamIn.Value = ClearTextPassword
+    Set ParamIn = cmdSql.CreateParameter("@password", admVarChar, admParamInput, 61)
+    ParamIn.Value = ctPassword
     cmdSql.Parameters.Append ParamIn
     Set ParamIn = Nothing
 
@@ -672,7 +632,7 @@ End Sub
 '------------------------------------------------------------------------------
 ' Use ADODB and stored procedure to remove user ID to SQL server application table
 ' Note: The user account is NOT removed from the database
-Private Sub RemoveEncryptedUserInfo(ByVal encryptedWinID As String)
+Private Sub RemoveEncryptedUserInfo(ByVal ecWinID As String)
     On Error GoTo errRemoveEncryptedUserInfo
 
     Dim cmdSql As ADODB.Command
@@ -685,8 +645,8 @@ Private Sub RemoveEncryptedUserInfo(ByVal encryptedWinID As String)
     cmdSql.CommandType = adCmdStoredProc
     cmdSql.CommandText = DatabaseName & ".[jcsm].[ApplicationRemoveUserID]"
 
-    Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", adVarChar, adParamInput, 80)
-    ParamIn.Value = encryptedWinID
+    Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", admVarChar, admParamInput, 80)
+    ParamIn.Value = ecWinID
     cmdSql.Parameters.Append ParamIn
     Set ParamIn = Nothing
 
@@ -720,7 +680,7 @@ End Property
 
 '------------------------------------------------------------------------------
 ' Use ADODB and stored procedure to remove user account from database
-Private Sub RemoveUserFromDB(ByVal clearTextWinIdUpperCase As String)
+Private Sub RemoveUserFromDB(ByVal ctWinIdUpperCase As String)
     On Error GoTo errRemoveUserFromDB
 
     Dim cmdSql As ADODB.Command
@@ -733,8 +693,8 @@ Private Sub RemoveUserFromDB(ByVal clearTextWinIdUpperCase As String)
     cmdSql.CommandType = adCmdStoredProc
     cmdSql.CommandText = DatabaseName & ".[jcsm].[ApplicationUserRemove]"
 
-    Set ParamIn = cmdSql.CreateParameter("@winID", adVarChar, adParamInput, 39)
-    ParamIn.Value = clearTextWinIdUpperCase
+    Set ParamIn = cmdSql.CreateParameter("@winID", admVarChar, admParamInput, 39)
+    ParamIn.Value = ctWinIdUpperCase
     cmdSql.Parameters.Append ParamIn
     Set ParamIn = Nothing
 
@@ -752,7 +712,7 @@ End Sub
 
 '-------------
 ' Use stored procedure to get encrypted password for given encrypted user ID
-Private Property Get GetEncryptedPassword(ByVal encryptedWinID As String) As String
+Private Property Get GetEncryptedPassword(ByVal ecWinID As String) As String
     On Error GoTo errGetEncryptedPassword
 
     Dim cmdSql As ADODB.Command
@@ -766,13 +726,13 @@ Private Property Get GetEncryptedPassword(ByVal encryptedWinID As String) As Str
     cmdSql.CommandType = adCmdStoredProc
     cmdSql.CommandText = DatabaseName & ".[jcsm].[ApplicationGetPassword]"
 
-    Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", adVarChar, adParamInput, 80)
-    ParamIn.Value = encryptedWinID
+    Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", admVarChar, admParamInput, 80)
+    ParamIn.Value = ecWinID
     cmdSql.Parameters.Append ParamIn
     Set ParamIn = Nothing
 
     ' Setup Return Parameters
-    Set ParamOut = cmdSql.CreateParameter("@EncodedPassword", adVarChar, adParamOutput, 252)
+    Set ParamOut = cmdSql.CreateParameter("@EncodedPassword", admVarChar, admParamOutput, 252)
     cmdSql.Parameters.Append ParamOut
     Set ParamOut = Nothing
 
@@ -796,49 +756,49 @@ End Property
 ' Use ADODB and stored procedure to change userId/Password Encryption
 ' New application key must exist in key table if using UsingThis.Cryptography
 ' Returns true if completed
-Private Function ChangeCrypt(ByVal ClearTextWinID As String, _
-                             ByVal KeyValueOld As String, _
-                             ByVal KeyValueNew As String) As Boolean
+Private Function ChangeCrypt(ByVal ctWinID As String, _
+                             ByVal ctKeyValueOld As String, _
+                             ByVal ctKeyValueNew As String) As Boolean
     On Error GoTo errChangeCrypt
 
     Dim cmdSql As ADODB.Command
     Dim ParamIn As ADODB.Parameter
-    Dim EncryptedPW As String
+    Dim ecPassword As String
 
-    ClearTextWinID = UCase(ClearTextWinID) ' Store user ID in upper case
+    ctWinID = UCase(ctWinID) ' Store user ID in upper case
 
     ' Check for user account by looking for it's stored password
-    EncryptedPW = GetEncryptedPassword(This.Cryptography.Hash(ClearTextWinID, HashAlgorithem))
+    ecPassword = GetEncryptedPassword(This.Cryptography.Hash(ctWinID, HashAlgorithem))
 
-    If EncryptedPW <> vbNullString Then
+    If ecPassword <> vbNullString Then
         Set cmdSql = New ADODB.Command
         cmdSql.ActiveConnection = ADODBConnection
         cmdSql.CommandType = adCmdStoredProc
         cmdSql.CommandText = "[" & DatabaseName & "].[jcsm].[ApplicationCryptChange]"
 
         ' Current WinID hash
-        Set ParamIn = cmdSql.CreateParameter("@CurrentWinIDEncoding", adVarChar, adParamInput, 80)
-        ParamIn.Value = This.Cryptography.Hash(ClearTextWinID, HashAlgorithem)
+        Set ParamIn = cmdSql.CreateParameter("@CurrentWinIDEncoding", admVarChar, admParamInput, 80)
+        ParamIn.Value = This.Cryptography.Hash(ctWinID, HashAlgorithem)
         cmdSql.Parameters.Append ParamIn
         Set ParamIn = Nothing
 
         ' New WinID hash
-        Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", adVarChar, adParamInput, 80)
-        ParamIn.Value = This.Cryptography.Hash(ClearTextWinID, HashAlgorithem)
+        Set ParamIn = cmdSql.CreateParameter("@EncodedWinID", admVarChar, admParamInput, 80)
+        ParamIn.Value = This.Cryptography.Hash(ctWinID, HashAlgorithem)
         cmdSql.Parameters.Append ParamIn
         Set ParamIn = Nothing
 
         ' New PW encryption
-        Set ParamIn = cmdSql.CreateParameter("@EncodedPassword", adVarChar, adParamInput, 255)
+        Set ParamIn = cmdSql.CreateParameter("@EncodedPassword", admVarChar, admParamInput, 255)
         ParamIn.Value = This.Cryptography.Encrypt( _
-                        This.Cryptography.Decrypt(EncryptedPW, KeyValueOld), KeyValueNew)
+                        This.Cryptography.Decrypt(ecPassword, ctKeyValueOld), ctKeyValueNew)
         cmdSql.Parameters.Append ParamIn
         Set ParamIn = Nothing
 
         cmdSql.Execute
         ChangeCrypt = True
     Else
-        LogMessage "ChangeCrypt", "User ID " & ClearTextWinID & " not in SQL database"
+        LogMessage "ChangeCrypt", "User ID " & ctWinID & " not in SQL database"
         ChangeCrypt = False
     End If
 
@@ -859,7 +819,7 @@ End Function
 '  2) Member of one of the application AD groups
 ' Return AdmUserTypeEnum.SQLNone if no access
 '
-Private Property Get UserAccessLevel(ByVal ClearTextWinID As String) As AdmUserTypeEnum
+Private Property Get UserAccessLevel(ByVal ctWinID As String) As AdmUserTypeEnum
     On Error GoTo errUserAccessLevel
     Dim ConfiguredAccessLevel As AdmUserTypeEnum
     Dim Response As Boolean
@@ -867,20 +827,20 @@ Private Property Get UserAccessLevel(ByVal ClearTextWinID As String) As AdmUserT
     ConfiguredAccessLevel = AdmUserTypeEnum.SQLNone
 
     ' Check if user has an Active Directory account.
-    RaiseEvent VerifyUserID(ClearTextWinID, Response)
+    RaiseEvent VerifyUserID(ctWinID, Response)
     If Response Then
         ' Check if user is member of the protected application group
-        RaiseEvent VerifyUserInGroup(ClearTextWinID, AdmUserTypeEnum.SQLProtected, Response)
+        RaiseEvent VerifyUserInGroup(ctWinID, AdmUserTypeEnum.SQLProtected, Response)
         If Response Then
             ConfiguredAccessLevel = AdmUserTypeEnum.SQLProtected
         Else
             ' Check if user is member of the normal application group
-            RaiseEvent VerifyUserInGroup(ClearTextWinID, AdmUserTypeEnum.SQLNormal, Response)
+            RaiseEvent VerifyUserInGroup(ctWinID, AdmUserTypeEnum.SQLNormal, Response)
             If Response Then
                 ConfiguredAccessLevel = AdmUserTypeEnum.SQLNormal
             Else
                 ' Check if user is member of the guest application group
-                RaiseEvent VerifyUserInGroup(ClearTextWinID, AdmUserTypeEnum.SQLGuest, Response)
+                RaiseEvent VerifyUserInGroup(ctWinID, AdmUserTypeEnum.SQLGuest, Response)
                 If Response Then
                     ConfiguredAccessLevel = AdmUserTypeEnum.SQLGuest
                 Else
@@ -921,8 +881,8 @@ Private Sub CheckDataBaseStatus()
 
     ' Setup Return Parameters
     Set ParamOut = cmdSql.CreateParameter("@Result", _
-                                            adInteger, _
-                                            adParamOutput)
+                                            admInteger, _
+                                            admParamOutput)
     cmdSql.Parameters.Append ParamOut
     Set ParamOut = Nothing
 
@@ -950,30 +910,30 @@ End Sub
 ' Provide SQL connection string's user name and password.
 '   usingNamedAccount: If True try using current user name.
 '                      If False use read-only name and password.
-' givenUserID       Given user name to get login information
+' ctWinID           User name to get login information
 ' usingNamedAccount Use named user ID otherwise read only account
 ' Return
 '   Example return:     ";UID=ClearTextUserID;PWD=ClearTextPassword"
 ' On error return empty string
-Private Property Get ODBC_UID_And_PWD(ByVal GivenUserID As String, _
+Private Property Get ODBC_UID_And_PWD(ByVal ctWinID As String, _
                                       ByVal UsingNamedAccount As Boolean) As String
     On Error GoTo errODBC_UID_And_PWD
-    Dim HashName As String
-    Dim EncryptedPW As String
-    Dim ClearTextName As String
+    Dim HashWinID As String
+    Dim ecPassword As String
+    Dim ctWinIdUpperCase As String
 
     If UsingNamedAccount Then
         ' User ID setup upper case in database
-        ClearTextName = UCase(GivenUserID)
-        If ClearTextName <> vbNullString Then
-            HashName = This.Cryptography.Hash(ClearTextName, HashAlgorithem)
-            EncryptedPW = GetEncryptedPassword(HashName)
-            If EncryptedPW = vbNullString Then
+        ctWinIdUpperCase = UCase(ctWinID)
+        If ctWinIdUpperCase <> vbNullString Then
+            HashWinID = This.Cryptography.Hash(ctWinIdUpperCase, HashAlgorithem)
+            ecPassword = GetEncryptedPassword(HashWinID)
+            If ecPassword = vbNullString Then
                 ' Revert to fallback account
                  ' Log missing SQL database account
                  Err.Raise AdmErrorEnum.SqlApplicationLoginNotFound, _
                            "ODBC_UID_And_PWD_ForCurrentUser", _
-                           "User AD Name: " & ClearTextName & _
+                           "User AD Name: " & ctWinIdUpperCase & _
                            " needs to be added, using 'RDP' read-only account"
             End If
             NamedUserAccount = True
@@ -986,24 +946,24 @@ Private Property Get ODBC_UID_And_PWD(ByVal GivenUserID As String, _
     Else
         ' Use fallback read only account
         UsingNamedAccount = False
-        ClearTextName = GuestID
-        HashName = This.Cryptography.Hash(ClearTextName, HashAlgorithem)
-        EncryptedPW = GuestLogin(False)
+        ctWinIdUpperCase = UCase(ctGuestLoginID)
+        HashWinID = This.Cryptography.Hash(ctWinIdUpperCase, HashAlgorithem)
+        ecPassword = ctGuestLogin(ReturnDecripted:=False)
         NamedUserAccount = False
     End If
 
 doneODBC_UID_And_PWD:
     On Error Resume Next
-    This.ODBCLogInName = ClearTextName
-    ODBC_UID_And_PWD = ";UID=" & ClearTextName & _
-                       ";PWD=" & This.Cryptography.Decrypt(EncryptedPW, UserAdminKey)
+    This.ODBCLogInName = ctWinIdUpperCase
+    ODBC_UID_And_PWD = ";UID=" & ctWinIdUpperCase & _
+                       ";PWD=" & This.Cryptography.Decrypt(ecPassword, ctUserAdminKey)
     Exit Property
 errODBC_UID_And_PWD:
     LogMessage "ODBC_UID_And_PWD_ForCurrentUser"
     UsingNamedAccount = False ' Cause a single level decrypt on return
-    ClearTextName = GuestID
-    HashName = This.Cryptography.Hash(ClearTextName, HashAlgorithem)
-    EncryptedPW = GuestLogin(False)                                        '
+    ctWinIdUpperCase = UCase(ctGuestLoginID)
+    HashWinID = This.Cryptography.Hash(ctWinIdUpperCase, HashAlgorithem)
+    ecPassword = ctGuestLogin(ReturnDecripted:=False)                                         '
     NamedUserAccount = False
     Resume doneODBC_UID_And_PWD
 End Property
@@ -1078,7 +1038,7 @@ Public Sub Configure(ByVal ClearTextAdminID As String, _
                      ByVal ClearTextGuestID As String, _
                      ByVal ClearTextGuestPW As String)
     On Error GoTo errConfigure
-    Dim KeyValue As String
+    Dim ctKeyValue As String
 
     If IsNull(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey)) Then
         ' Note: Existing User accounts will need to be updated after setting the admin encription key
@@ -1099,28 +1059,28 @@ Public Sub Configure(ByVal ClearTextAdminID As String, _
         End If
 
         ' Create new user administration key
-        KeyValue = UserAdminKey(IssueNewKey:=True)
+        ctKeyValue = ctUserAdminKey(IssueNewKey:=True)
 
         With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
 
             ' Save user admin account
             .Parameters(0) = AdmKeyEnum.admUserAdminID
-            .Parameters(1) = This.Cryptography.Encrypt(ClearTextAdminID, KeyValue)
+            .Parameters(1) = This.Cryptography.Encrypt(ClearTextAdminID, ctKeyValue)
             .Execute dbFailOnError + dbSeeChanges
 
             ' Save user admin password
             .Parameters(0) = AdmKeyEnum.admUserAdminPW
-            .Parameters(1) = This.Cryptography.Encrypt(ClearTextAdminPW, KeyValue)
+            .Parameters(1) = This.Cryptography.Encrypt(ClearTextAdminPW, ctKeyValue)
             .Execute dbFailOnError + dbSeeChanges
 
             ' Save Read-only ID
             .Parameters(0) = AdmKeyEnum.admGuestID
-            .Parameters(1) = This.Cryptography.Encrypt(ClearTextGuestID, KeyValue)
+            .Parameters(1) = This.Cryptography.Encrypt(ClearTextGuestID, ctKeyValue)
             .Execute dbFailOnError + dbSeeChanges
 
             ' Save Read-Only password
             .Parameters(0) = AdmKeyEnum.admGuestLogin
-            .Parameters(1) = This.Cryptography.Encrypt(ClearTextGuestPW, KeyValue)
+            .Parameters(1) = This.Cryptography.Encrypt(ClearTextGuestPW, ctKeyValue)
             .Execute dbFailOnError + dbSeeChanges
         End With
     End If
@@ -1158,9 +1118,12 @@ End Sub
 Public Function RandomPassword(Optional ByVal MinLength As Integer = 10, _
                                Optional ByVal MaxLength As Integer = 13) As String
     On Error GoTo errRandomPassword
-    Dim ClearTextPassword As String
+    Dim ctPassword As String
     Dim i As Integer
     Dim TryCount As Integer
+    Dim ctKeyValue As String
+
+    ctKeyValue = ctUserAdminKey
     Do
         TryCount = TryCount + 1
         If TryCount > 20 Then
@@ -1168,20 +1131,20 @@ Public Function RandomPassword(Optional ByVal MinLength As Integer = 10, _
                       "Failed to generate a password that can be Encripted/Decrypted"
         End If
 
-        ClearTextPassword = Mid(ALPHABETICCHARACTERS, This.Cryptography.RandomInt(1, Len(ALPHABETICCHARACTERS)), 1)
+        ctPassword = Mid(ALPHABETICCHARACTERS, This.Cryptography.RandomInt(1, Len(ALPHABETICCHARACTERS)), 1)
         For i = 2 To This.Cryptography.RandomInt(MinLength, MaxLength)
-            ClearTextPassword = ClearTextPassword & _
-                                Mid(PASSWORDCHARACTERS, This.Cryptography.RandomInt(1, Len(PASSWORDCHARACTERS)), 1)
+            ctPassword = ctPassword & _
+                         Mid(PASSWORDCHARACTERS, This.Cryptography.RandomInt(1, Len(PASSWORDCHARACTERS)), 1)
         Next
         ' Try up to 20 times or until it can be Encrypted and then Decrypted
     Loop Until This.Cryptography.Decrypt( _
-               This.Cryptography.Encrypt(ClearTextPassword, UserAdminKey), UserAdminKey) = ClearTextPassword
+               This.Cryptography.Encrypt(ctPassword, ctKeyValue), ctKeyValue) = ctPassword
 doneRandomPassword:
-    RandomPassword = ClearTextPassword
+    RandomPassword = ctPassword
     Exit Function
 errRandomPassword:
     LogMessage "RandomPassword"
-    ClearTextPassword = vbNullString
+    ctPassword = vbNullString
     Resume doneRandomPassword
 End Function
 
@@ -1195,6 +1158,7 @@ Public Function AddUser(ByVal ClearTextWinID As String, _
                         Optional ByVal ClearTextPWadmin As String = vbNullString) As Boolean
     On Error GoTo errAddUser
     Dim UserWasAdded As Boolean
+    Dim ctKeyValue As String
 
     ClearLastError
     UserWasAdded = False
@@ -1205,6 +1169,7 @@ Public Function AddUser(ByVal ClearTextWinID As String, _
     End If
 
     ClearTextWinID = UCase(ClearTextWinID) ' Store user ID in upper case
+    ctKeyValue = ctUserAdminKey
 
     If UserAccessLevel(ClearTextWinID) <> AdmUserTypeEnum.SQLNone Then
         If GetEncryptedPassword(This.Cryptography.Hash(ClearTextWinID, HashAlgorithem)) = vbNullString Then
@@ -1215,7 +1180,7 @@ Public Function AddUser(ByVal ClearTextWinID As String, _
             Else
                 ' Verify supplied password can be encrypted and decrypted
                 If ClearTextPWadmin <> This.Cryptography.Decrypt( _
-                                       This.Cryptography.Encrypt(ClearTextPWadmin, UserAdminKey), UserAdminKey) Then
+                                       This.Cryptography.Encrypt(ClearTextPWadmin, ctKeyValue), ctKeyValue) Then
                     Err.Raise AdmErrorEnum.ObjectError, "AddUser", _
                               "User ID: " & ClearTextWinID & " supplied password could not be used"
                 End If
@@ -1223,7 +1188,7 @@ Public Function AddUser(ByVal ClearTextWinID As String, _
             If ClearTextPWadmin <> vbNullString Then
                 ' Add the encripted user and password to the application table on SQL server.
                 AddEncryptedUserInfo This.Cryptography.Hash(ClearTextWinID, HashAlgorithem), _
-                                     This.Cryptography.Encrypt(ClearTextPWadmin, UserAdminKey)
+                                     This.Cryptography.Encrypt(ClearTextPWadmin, ctKeyValue)
                 If LastErrorNumber = AdmErrorEnum.Noerror Then
                     ' Add user to database
                     AddUserToDB ClearTextWinID, ClearTextPWadmin
@@ -1297,15 +1262,15 @@ End Function
 ' Add user getting UserID from NextUserID event
 Public Sub AddUserFromNextUserID()
     On Error GoTo errAddUserFromNextUserID
-    Dim UserID As String
+    Dim ctWinID As String
 
     ClearLastError
-    RaiseEvent NextUserID(UserID)
-    Do Until UserID = vbNullString
-        If AddUser(UserID) Then
-            RaiseEvent NextUserID(UserID)
+    RaiseEvent NextUserID(ctWinID)
+    Do Until ctWinID = vbNullString
+        If AddUser(ctWinID) Then
+            RaiseEvent NextUserID(ctWinID)
         Else
-            Err.Raise LastErrorNumber, "AddUserFromNextUserID", "Failed to add: " & UserID
+            Err.Raise LastErrorNumber, "AddUserFromNextUserID", "Failed to add: " & ctWinID
         End If
     Loop
 
@@ -1322,38 +1287,36 @@ End Sub
 ' Caller supplies UserID though class event procedure
 Public Sub UpdateDbEncription()
     On Error GoTo errUpdateDbEncription
-    Dim ctUserID As String  ' Clear text user ID to be update
-    Dim ctGuestID As String
-    Dim ctGuestPW As String
+
+    Dim ctWinID As String
+    Dim ctGuestWinID As String
+    Dim ctGuestPassword As String
     Dim ctApplicationKeyNew As String
     Dim ctAdminKeyOld As String
     Dim ctAdminKeyNew As String
-    Dim ctAdminID As String
-    Dim ctAdminPW As String
-    Dim qryUpdate As DAO.QueryDef
+    Dim ctAdminDatabaseID As String
+    Dim ctAdminPassword As String
 
     ClearLastError
 
-    If Not IsNull(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey)) And _
-       Not IsNull(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKeyNew)) Then
-        Err.Raise AdmErrorEnum.ObjectError, "UpdateDbEncription", _
-                  "Cannot generate new key if new key position if not empty"
+    If This.ADODBConnection Is Nothing Then
+        Set This.ADODBConnection = ADODBConnection
     End If
 
-    ctAdminKeyOld = UserAdminKey
-    ctAdminID = UserAdminID
-    ctAdminPW = UserAdminLogin
-    ctGuestID = GuestID
-    ctGuestPW = GuestLogin
+    ctAdminKeyOld = ctUserAdminKey
+    ctAdminDatabaseID = ctUserAdminID
+    ctAdminPassword = ctUserAdminLogin
+    ctGuestWinID = ctGuestLoginID
+    ctGuestPassword = ctGuestLogin
 
     ' Generate new application key in key table
-    ctApplicationKeyNew = ApplicationKey(IssueNewKey:=True)
+    ctApplicationKeyNew = ctApplicationKey(IssueNewKey:=True)
     If ctApplicationKeyNew = vbNullString Then
         Err.Raise LastErrorNumber, "UpdateUserInDb", "Failed to get new application key"
     End If
 
     ' Generate new admin key in key table
-    ctAdminKeyNew = UserAdminKey(IssueNewKey:=True)
+    ctAdminKeyNew = ctUserAdminKey(IssueNewKey:=True)
     If ctAdminKeyNew = vbNullString Then
         Err.Raise LastErrorNumber, "UpdateUserInDb", "Failed to get new admin key"
     End If
@@ -1361,40 +1324,39 @@ Public Sub UpdateDbEncription()
     With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
         ' Save user admin account ID
         .Parameters(0) = AdmKeyEnum.admUserAdminID
-        .Parameters(1) = This.Cryptography.Encrypt(ctAdminID, ctAdminKeyNew)
+        .Parameters(1) = This.Cryptography.Encrypt(ctAdminDatabaseID, ctAdminKeyNew)
         .Execute dbFailOnError + dbSeeChanges
 
         ' Save new Admin account password
         .Parameters(0) = AdmKeyEnum.admUserAdminPW
-        .Parameters(1) = This.Cryptography.Encrypt(ctAdminPW, ctAdminKeyNew)
+        .Parameters(1) = This.Cryptography.Encrypt(ctAdminPassword, ctAdminKeyNew)
         .Execute dbFailOnError + dbSeeChanges
 
         ' Save Read only account ID
         .Parameters(0) = AdmKeyEnum.admGuestID
-        .Parameters(1) = This.Cryptography.Encrypt(ctGuestID, ctAdminKeyNew)
+        .Parameters(1) = This.Cryptography.Encrypt(ctGuestWinID, ctAdminKeyNew)
         .Execute dbFailOnError + dbSeeChanges
 
         ' Save Read only account password
         .Parameters(0) = AdmKeyEnum.admGuestLogin
-        .Parameters(1) = This.Cryptography.Encrypt(ctGuestPW, ctAdminKeyNew)
+        .Parameters(1) = This.Cryptography.Encrypt(ctGuestPassword, ctAdminKeyNew)
         .Execute dbFailOnError + dbSeeChanges
     End With
 
     ' Update user accounts using old and new user admin keys
-    RaiseEvent NextUserID(ctUserID)
-    Do Until ctUserID = vbNullString
-Debug.Print ctUserID
-        If Not ChangeCrypt(ctUserID, ctAdminKeyOld, ctAdminKeyNew) Then
+    RaiseEvent NextUserID(ctWinID)
+    Do Until ctWinID = vbNullString
+Debug.Print ctWinID
+        If Not ChangeCrypt(ctWinID, ctAdminKeyOld, ctAdminKeyNew) Then
             If LastErrorNumber <> AdmErrorEnum.Noerror Then
-                Err.Raise AdmErrorEnum.ObjectError, "UpdateUserInDb", "Failed to update user: " & ctUserID
+                Err.Raise AdmErrorEnum.ObjectError, "UpdateUserInDb", "Failed to update user: " & ctWinID
             End If
         End If
-        RaiseEvent NextUserID(ctUserID)
+        RaiseEvent NextUserID(ctWinID)
     Loop
 
-    ' Move new Key to current key and empty new key in key table
-    UserAdminKeyFinishReplacement
 doneUpdateDbEncription:
+    ReleaseADODB
     Exit Sub
 errUpdateDbEncription:
     LogMessage "UpdateUserInDB"
@@ -1440,32 +1402,31 @@ End Property
 ' Create a Cached logged in connection to SQL server
 ' https://www.microsoft.com/en-us/microsoft-365/blog/2011/04/08/power-tip-improve-the-security-of-database-connections/
 ' https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
-' LoginNameTest User ID to test ability to login otherwise currently login user ID
-' useoAdmin     Use this ClassAdm otherwise create new
-Public Function ODBCConnectToSql(Optional LoginNameTest As String = vbNullString) As AdmUserTypeEnum
+' ClearTextLoginName User ID to test ability to login otherwise currently login user ID
+Public Function ODBCConnectToSql(Optional ClearTextLoginName As String = vbNullString) As AdmUserTypeEnum
     On Error GoTo errODBCConnectToSql
     Dim rst As DAO.Recordset
     Dim UseNamedAccount As Boolean
-    Dim UserIdToConnect As String
+    Dim ctUserIdToConnect As String
 
     ClearLastError
     UseNamedAccount = True
     This.SQLUserType = AdmUserTypeEnum.SQLNone
     This.ODBCLogInName = vbNullString
 
-    If LoginNameTest = vbNullString Then
-        UserIdToConnect = UserID()
+    If ClearTextLoginName = vbNullString Then
+        ctUserIdToConnect = ctLoginUserID
     Else
-        UserIdToConnect = LoginNameTest
+        ctUserIdToConnect = ClearTextLoginName
     End If
 
     With DBEngine(0)(0)
 retryConnectUsingReadOnly:
         With .CreateQueryDef(vbNullString)
             .Connect = ODBCConnectionString & _
-                       ODBC_UID_And_PWD(UserIdToConnect, UseNamedAccount)
+                       ODBC_UID_And_PWD(ctUserIdToConnect, UseNamedAccount)
 
-            If LoginNameTest <> vbNullString And InStr(1, .Connect, LoginNameTest) = 0 Then
+            If ClearTextLoginName <> vbNullString And InStr(1, .Connect, ClearTextLoginName) = 0 Then
                 This.SQLUserType = AdmUserTypeEnum.SQLNone
             ElseIf InStr(1, .Connect, "PWD=") = 0 Then
                 This.SQLUserType = AdmUserTypeEnum.SQLNone
@@ -1493,7 +1454,7 @@ errODBCConnectToSql:
                IIf(UseNamedAccount, "Retry using using read only account. ", vbNullString) & _
                "LastError (" & LastErrorNumber & ") " & LastErrorDescription & _
                ", " & ODBCConnectionString
-    If UseNamedAccount And LoginNameTest = vbNullString Then
+    If UseNamedAccount And ClearTextLoginName = vbNullString Then
         ' Retry using read-only acccount
         UseNamedAccount = False
         Resume retryConnectUsingReadOnly
