@@ -6,7 +6,11 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "2025-03-04T20:05:13.000Z",
+<<<<<<< HEAD
     "ExportDate": "2025-03-07T18:22:59.000Z",
+=======
+    "ExportDate": "2025-03-07T16:57:09.000Z",
+>>>>>>> remotes/origin/main
     "FullExportDate": "2025-03-04T20:00:47.000Z",
     "OptionsHash": "f7c78cc",
     "LastMergedCommit": "",
@@ -40,17 +44,29 @@
       "Forms": {
         "A.bas": {
           "FileHash": "6e06019",
+<<<<<<< HEAD
           "ExportDate": "2025-03-07T18:22:56.000Z",
           "SourceModified": null,
           "FilePropertiesHash": "b54f170",
+=======
+          "ExportDate": "2025-03-07T16:51:35.000Z",
+          "SourceModified": null,
+          "FilePropertiesHash": "b9994a7",
+>>>>>>> remotes/origin/main
           "ImportDate": "2025-03-04T20:05:11.000Z",
           "OtherHash": "a235d3b"
         },
         "MainMenu.bas": {
           "FileHash": "56c371f",
+<<<<<<< HEAD
           "ExportDate": "2025-03-07T18:22:56.000Z",
           "SourceModified": null,
           "FilePropertiesHash": "553ddc2",
+=======
+          "ExportDate": "2025-03-07T16:51:35.000Z",
+          "SourceModified": null,
+          "FilePropertiesHash": "ae83602",
+>>>>>>> remotes/origin/main
           "ImportDate": "2025-03-04T20:05:11.000Z",
           "OtherHash": "e9c4929"
         },
@@ -69,6 +85,7 @@
       },
       "Modules": {
         "ClassAdm.cls": {
+<<<<<<< HEAD
           "FileHash": "346695c",
           "ExportDate": "2025-03-07T18:22:55.000Z",
           "SourceModified": null,
@@ -81,6 +98,20 @@
           "ExportDate": "2025-03-07T18:22:55.000Z",
           "SourceModified": null,
           "FilePropertiesHash": "7950e20",
+=======
+          "FileHash": "3c55ef2",
+          "ExportDate": "2025-03-07T16:57:09.000Z",
+          "SourceModified": null,
+          "FilePropertiesHash": "0792e22",
+          "ImportDate": "2025-03-04T20:05:10.000Z",
+          "OtherHash": "57311bb"
+        },
+        "ClassCrypt.cls": {
+          "FileHash": "ea45492",
+          "ExportDate": "2025-03-07T16:51:34.000Z",
+          "SourceModified": null,
+          "FilePropertiesHash": "b72b044",
+>>>>>>> remotes/origin/main
           "ImportDate": "2025-03-04T20:05:10.000Z",
           "OtherHash": "637cd9c"
         },
