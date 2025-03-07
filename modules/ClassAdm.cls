@@ -479,7 +479,6 @@ End Property
 '             else fill new key
 Private Property Get UserAdminKey(Optional ByVal IssueNewKey As Boolean = False) As String
     On Error GoTo errUserAdminKey
-'    Static KeyValue As String
     Dim KeyIsEmpty As Boolean
 
     If IssueNewKey Then
@@ -490,7 +489,6 @@ Private Property Get UserAdminKey(Optional ByVal IssueNewKey As Boolean = False)
                           "Cannot generate new key if new key position if not empty"
             End If
         End If
-'        KeyValue = This.Cryptography.Random(12)
         This.EncryptedUserAdminKey = This.Cryptography.Encrypt(This.Cryptography.Random(12), UserAppKey)
         ' Save application key
         With CurrentDb.CreateQueryDef(vbNullString, QryUpdateUSysVar)
@@ -502,13 +500,10 @@ Private Property Get UserAdminKey(Optional ByVal IssueNewKey As Boolean = False)
             .Parameters(1) = This.EncryptedUserAdminKey ' This.Cryptography.Encrypt(KeyValue, UserAppKey)
             .Execute dbFailOnError + dbSeeChanges
         End With
-'        UserAdminKey = KeyValue
     Else
         If This.EncryptedUserAdminKey = vbNullString Then
-'            KeyValue = This.Cryptography.Decrypt(DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey), UserAppKey)
             This.EncryptedUserAdminKey = DLookup("[sValue]", "usysvar", "[ID]=" & AdmKeyEnum.admUserAdminKey)
         End If
-'        UserAdminKey = KeyValue
     End If
     UserAdminKey = This.Cryptography.Decrypt(This.EncryptedUserAdminKey, UserAppKey)
 doneUserAdminKey:
