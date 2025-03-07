@@ -51,6 +51,7 @@ Private Type SystemForm
     SQLUserType As AdmUserTypeEnum ' Type of user account, SQLNone if failed to login
 
     rsUserList As DAO.Recordset    ' Opened and closed by UpdateUserKeys and AddUserList
+    ProjectName As String
 End Type
 Private This As SystemForm
 
@@ -78,12 +79,12 @@ Private Declare PtrSafe Function apiGetUserName _
 ' Log the module, function and optional message with error information
 '
 Private Sub LogMessage(ByVal SourceFunction As String, _
-                     Optional ByVal errorMessage As String = vbNullString)
+                       Optional ByVal ErrorMessage As String = vbNullString)
     This.FormErrorSource = ModuleName & "." & SourceFunction
     This.FormError = Err.Number
     This.FormErrorText = Err.Description
     Logger This.FormErrorSource, _
-            errorMessage, _
+            ErrorMessage, _
             This.FormError, _
             This.FormErrorText
 End Sub
@@ -99,12 +100,12 @@ End Sub
 '------------------
 ' Return the current user's login ID
 Private Sub clsAdm_LoginUserID(ByRef UserID)
-    Dim logInShortName As String
-    Dim lngLen As Long
-    logInShortName = String$(254, 0)
-    lngLen = 255
-    If apiGetUserName(logInShortName, lngLen) > 0 Then
-        UserID = Trim$(left$(logInShortName, lngLen - 1))
+    Dim LogInShortName As String
+    Dim LngLen As Long
+    LogInShortName = String$(254, 0)
+    LngLen = 255
+    If apiGetUserName(LogInShortName, LngLen) > 0 Then
+        UserID = Trim$(left$(LogInShortName, LngLen - 1))
     End If
 End Sub
 '---------------------------
@@ -234,7 +235,7 @@ errForm_Open:
     Logger ModuleName & ".Form_Open", "Error opening form", Err.Number, Err.Description
     MsgBox "Error opening PAI" & vbCrLf & Err.Description, vbCritical, "Error"
     On Error Resume Next
-    Application.Quit acQuitSaveNone
+'    Application.Quit acQuitSaveNone
     Resume doneForm_Open
 End Sub
 
@@ -287,11 +288,10 @@ End Property
 ' https://www.access-programmers.co.uk/forums/threads/how-to-get-the-project-name.332509/
 Public Property Get ProjectName() As String
     On Error Resume Next
-    Static PName As String
-    If PName = vbNullString Then
-        PName = Application.VBE.VBProjects(1).Name
+    If This.ProjectName = vbNullString Then
+        This.ProjectName = Application.VBE.VBProjects(1).Name
     Else
-        ProjectName = PName
+        ProjectName = This.ProjectName
     End If
 End Property
 
@@ -329,11 +329,11 @@ End Property
 ' Reference to the current database
 Public Property Get DB() As DAO.Database
     On Error GoTo errDB
-    Dim testWillFailIfDatabaseIsNotOpen As String
+    Dim TestWillFailIfDatabaseIsNotOpen As String
     If This.AppDatabase Is Nothing Then
         Set This.AppDatabase = WS.Databases(0)
         ' Test that a database is open
-        testWillFailIfDatabaseIsNotOpen = This.AppWorkSpace.Name
+        TestWillFailIfDatabaseIsNotOpen = This.AppWorkSpace.Name
     End If
 doneDB:
     Set DB = This.AppDatabase

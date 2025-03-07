@@ -29,15 +29,15 @@ Private Sub btnLinkTable_Click()
     LinkSQL Me.txtServerTable, Me.txtLocalTable
 End Sub
 
-Private Sub LinkSQL(ByVal tableSQL As String, ByVal tableLocal As String)
+Private Sub LinkSQL(ByVal TableSQL As String, ByVal TableLocal As String)
     On Error GoTo errLinkSQL
-    Dim curTable As DAO.TableDef
-    Set curTable = CurrentDb.CreateTableDef(tableLocal)
-    curTable.Connect = Form_A.oAdm.ODBCConnectionString
-    curTable.SourceTableName = tableSQL
-    CurrentDb.TableDefs.Append curTable
+    Dim NewLink As DAO.TableDef
+    Set NewLink = Form_A.DB.CreateTableDef(TableLocal)
+    NewLink.Connect = Form_A.oAdm.ODBCConnectionString
+    NewLink.SourceTableName = TableSQL
+    Form_A.DB.TableDefs.Append NewLink
 doneLinkSQL:
-    Set curTable = Nothing
+    Set NewLink = Nothing
     Exit Sub
 errLinkSQL:
     Logger ModuleName & ".LinkSQL", , Err.Number, Err.Description

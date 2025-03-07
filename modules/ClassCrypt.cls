@@ -248,7 +248,7 @@ End Type
 Private This As CryptType
 
 Private Sub LogMessage(ByVal FunctionName As String, _
-                       Optional ByVal errorMessage As String = vbNullString)
+                       Optional ByVal ErrorMessage As String = vbNullString)
     With This
         .ClassError = Err.Number
         .ClassErrorText = Err.Description
@@ -256,13 +256,14 @@ Private Sub LogMessage(ByVal FunctionName As String, _
         On Error Resume Next
         If This.LoggerFunctionName = vbNullString Then
             Debug.Print .ClassErrorSource, _
-                        errorMessage, _
+                        ErrorMessage, _
                        "error (" & .ClassError & ")", _
                        .ClassErrorText
         Else
+            ' This will cause an un-trapped error if LoggerFunctionName cannot be found!
             Application.Run .LoggerFunctionName, _
                             .ClassErrorSource, _
-                             errorMessage, _
+                             ErrorMessage, _
                             .ClassError, _
                             .ClassErrorText
         End If
