@@ -53,7 +53,7 @@ Private Const ModuleName As String = "ClassAdm"
 '       .. No membership of user roles
 '       .. No database rights
 '       .. Securables: Only execute rights on "Application" stored procedures
-'   e. (RDP) Guest read-only accout
+'   e. (RDP) Guest read-only account
 '       .. Password: Today@1
 '       .. Default schema: [dbo]
 '       .. No owned schemas
@@ -918,7 +918,6 @@ End Sub
 Private Property Get ODBC_UID_And_PWD(ByVal ctWinID As String, _
                                       ByVal UsingNamedAccount As Boolean) As String
     On Error GoTo errODBC_UID_And_PWD
-    Dim HashWinID As String
     Dim ecPassword As String
     Dim ctWinIdUpperCase As String
 
@@ -926,8 +925,7 @@ Private Property Get ODBC_UID_And_PWD(ByVal ctWinID As String, _
         ' User ID setup upper case in database
         ctWinIdUpperCase = UCase(ctWinID)
         If ctWinIdUpperCase <> vbNullString Then
-            HashWinID = This.Cryptography.Hash(ctWinIdUpperCase, HashAlgorithem)
-            ecPassword = GetEncryptedPassword(HashWinID)
+            ecPassword = GetEncryptedPassword(This.Cryptography.Hash(ctWinIdUpperCase, HashAlgorithem))
             If ecPassword = vbNullString Then
                 ' Revert to fallback account
                  ' Log missing SQL database account
@@ -947,7 +945,6 @@ Private Property Get ODBC_UID_And_PWD(ByVal ctWinID As String, _
         ' Use fallback read only account
         UsingNamedAccount = False
         ctWinIdUpperCase = UCase(ctGuestLoginID)
-        HashWinID = This.Cryptography.Hash(ctWinIdUpperCase, HashAlgorithem)
         ecPassword = ctGuestLogin(ReturnDecripted:=False)
         NamedUserAccount = False
     End If
@@ -962,7 +959,6 @@ errODBC_UID_And_PWD:
     LogMessage "ODBC_UID_And_PWD_ForCurrentUser"
     UsingNamedAccount = False ' Cause a single level decrypt on return
     ctWinIdUpperCase = UCase(ctGuestLoginID)
-    HashWinID = This.Cryptography.Hash(ctWinIdUpperCase, HashAlgorithem)
     ecPassword = ctGuestLogin(ReturnDecripted:=False)                                         '
     NamedUserAccount = False
     Resume doneODBC_UID_And_PWD
