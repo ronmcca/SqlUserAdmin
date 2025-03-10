@@ -152,13 +152,15 @@ Private Const PASSWORDCHARACTERS As String = NUMERICCHARACTERS & _
 Private Const HashAlgorithem As Long = 6 ' From ClassCrypt, BcHashAlgorithm.bcSha384
 
 ' USysVar row ID for application keys
-Private Enum AdmKeyEnum
+Public Enum AdmKeyEnum
+    adm_First = 0
     admUserAdminKey = 1
     admUserAdminID = 3
     admUserAdminPW = 4
     admGuestID = 5
     admGuestLogin = 6
     admAppKeyList = 7
+    adm_Last = 8
 End Enum
 
 Public Enum AdmDatabaseStatusEnum
@@ -932,18 +934,17 @@ Private Property Get ODBC_UID_And_PWD(ByVal ctWinID As String, _
                  Err.Raise AdmErrorEnum.SqlApplicationLoginNotFound, _
                            "ODBC_UID_And_PWD_ForCurrentUser", _
                            "User AD Name: " & ctWinIdUpperCase & _
-                           " needs to be added, using 'RDP' read-only account"
+                           " needs to be added, using '" & ctGuestLoginID & "' read-only account"
             End If
             NamedUserAccount = True
         Else
             ' No user name found in AD, use fallback acount
-            Err.Raise AdmErrorEnum.ADAccountNotFound, _
+            Err.Raise AdmErrorEnum.MissingInfo, _
                       "ODBC_UID_And_PWD_ForCurrentUser", _
-                      "User not in AD group, using 'RDP' read-only account"
+                      "User ID missing, using '" & ctGuestLoginID & "' read-only account"
         End If
     Else
         ' Use fallback read only account
-        UsingNamedAccount = False
         ctWinIdUpperCase = UCase(ctGuestLoginID)
         ecPassword = ctGuestLogin(ReturnDecripted:=False)
         NamedUserAccount = False
@@ -957,7 +958,6 @@ doneODBC_UID_And_PWD:
     Exit Property
 errODBC_UID_And_PWD:
     LogMessage "ODBC_UID_And_PWD_ForCurrentUser"
-    UsingNamedAccount = False ' Cause a single level decrypt on return
     ctWinIdUpperCase = UCase(ctGuestLoginID)
     ecPassword = ctGuestLogin(ReturnDecripted:=False)                                         '
     NamedUserAccount = False
@@ -1305,13 +1305,13 @@ Public Sub UpdateDbEncription()
     ctGuestWinID = ctGuestLoginID
     ctGuestPassword = ctGuestLogin
 
-    ' Generate new application key in key table
+    ' Generate new application key in key an update key table
     ctApplicationKeyNew = ctApplicationKey(IssueNewKey:=True)
     If ctApplicationKeyNew = vbNullString Then
         Err.Raise LastErrorNumber, "UpdateUserInDb", "Failed to get new application key"
     End If
 
-    ' Generate new admin key in key table
+    ' Generate new admin key in key and update key table
     ctAdminKeyNew = ctUserAdminKey(IssueNewKey:=True)
     If ctAdminKeyNew = vbNullString Then
         Err.Raise LastErrorNumber, "UpdateUserInDb", "Failed to get new admin key"
@@ -1422,7 +1422,8 @@ retryConnectUsingReadOnly:
             .Connect = ODBCConnectionString & _
                        ODBC_UID_And_PWD(ctUserIdToConnect, UseNamedAccount)
 
-            If ClearTextLoginName <> vbNullString And InStr(1, .Connect, ClearTextLoginName) = 0 Then
+            If ClearTextLoginName <> vbNullString And _
+               InStr(1, .Connect, ClearTextLoginName) = 0 Then
                 This.SQLUserType = AdmUserTypeEnum.SQLNone
             ElseIf InStr(1, .Connect, "PWD=") = 0 Then
                 This.SQLUserType = AdmUserTypeEnum.SQLNone
@@ -1431,7 +1432,11 @@ retryConnectUsingReadOnly:
             Else
                 .SQL = "SELECT @@OPTIONS;" ' Simple query to cause login
                 Set rst = .OpenRecordset(dbOpenSnapshot, dbSQLPassThrough)
-                This.SQLUserType = AdmUserTypeEnum.SQLNormal
+                If This.NamedUserAccount Then
+                    This.SQLUserType = UserAccessLevel(ctUserIdToConnect)
+                Else
+                    This.SQLUserType = AdmUserTypeEnum.SQLGuest
+                End If
             End If
         End With
     End With

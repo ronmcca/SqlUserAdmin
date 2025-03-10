@@ -140,7 +140,11 @@ End Sub
 Private Sub clsAdm_VerifyUserInGroup(ByVal ClearTextUserID As String, _
                                      ByVal AccessType As AdmUserTypeEnum, _
                                      ByRef Response As Boolean)
-    Response = True
+    If AccessType = AdmUserTypeEnum.SQLNormal Then
+        Response = True
+    Else
+        Response = False
+    End If
 End Sub
 '----------------------------------
 ' In production get SQL server name from config file
@@ -506,4 +510,61 @@ errUpdateEncription:
     UpdateEncription = Err.Number
     LogMessage "UpdateUserKeys"
     Resume doneUpdateEncription
+End Function
+
+'----------------
+' Clean start database
+' Remove all applicaiton users from SQL server
+' Erase all keys if all users were removed.
+'
+Public Function CleanStart() As SystemErrorEnum
+    On Error GoTo errCleanStart
+    Dim UserID As String
+    ClearLastError
+    Set This.rsUserList = DB.OpenRecordset("SELECT feUser.UserID, feUser.SQLAccountSetup " & _
+                                           "FROM feUser " & _
+                                           "WHERE SQLAccountSetup <> False;", _
+                                            RecordsetTypeEnum.dbOpenDynaset)
+    If This.rsUserList.RecordCount > 0 Then
+        ' Remove all SQL server accounts for application users
+        This.rsUserList.MoveFirst
+        Do While Not This.rsUserList.EOF
+            UserID = This.rsUserList![UserID]
+            If oAdm.RemoveUser(UserID) Then
+                This.rsUserList.Edit
+                This.rsUserList![SQLAccountSetup] = False
+                This.rsUserList.Update
+            End If
+            If oAdm.LastErrorNumber <> SystemErrorEnum.Noerror Then
+                Err.Raise oAdm.LastErrorNumber, "CleanStart", "Failed to remove user: " & UserID
+            End If
+            This.rsUserList.MoveNext
+        Loop
+        This.rsUserList.Close
+        Set This.rsUserList = Nothing
+        ' Remove all saved application keys
+        DB.Execute "UPDATE USysVar SET USysVar.sValue = Null " & _
+                   "WHERE USysVar.ID Between " & AdmKeyEnum.adm_First & _
+                                       " And " & AdmKeyEnum.adm_Last & ";", _
+                   RecordsetOptionEnum.dbFailOnError
+
+        CleanStart = SystemErrorEnum.Noerror
+    Else
+        CleanStart = SystemErrorEnum.MissingInfo
+    End If
+
+doneCleanStart:
+    On Error Resume Next
+    clsAdm.ReleaseADODB
+    Set clsAdm = Nothing
+    Set clsAdm = New ClassAdm
+    If Not This.rsUserList Is Nothing Then
+        This.rsUserList.Close
+        Set This.rsUserList = Nothing
+    End If
+    Exit Function
+errCleanStart:
+    CleanStart = Err.Number
+    LogMessage "UpdateUserKeys"
+    Resume doneCleanStart
 End Function

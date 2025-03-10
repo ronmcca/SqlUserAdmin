@@ -12,11 +12,11 @@ Begin Form
     GridY =24
     Width =8160
     DatasheetFontHeight =11
-    ItemSuffix =19
+    ItemSuffix =20
     Left =7110
-    Top =2415
-    Right =16905
-    Bottom =10050
+    Top =2655
+    Right =15810
+    Bottom =7740
     RecSrcDt = Begin
         0xc9809ee98a52e640
     End
@@ -123,7 +123,7 @@ Begin Form
         End
         Begin Section
             CanGrow = NotDefault
-            Height =4680
+            Height =5100
             Name ="Detail"
             AlternateBackThemeColorIndex =1
             AlternateBackShade =95.0
@@ -252,7 +252,7 @@ Begin Form
                     Left =300
                     Top =1080
                     Width =3120
-                    Height =3420
+                    Height =3900
                     TabIndex =7
                     Name ="UserList"
                     SourceObject ="Form.UserList"
@@ -260,7 +260,7 @@ Begin Form
                     LayoutCachedLeft =300
                     LayoutCachedTop =1080
                     LayoutCachedWidth =3420
-                    LayoutCachedHeight =4500
+                    LayoutCachedHeight =4980
                     Begin
                         Begin Label
                             OverlapFlags =93
@@ -312,6 +312,24 @@ Begin Form
                     LayoutCachedTop =3600
                     LayoutCachedWidth =8040
                     LayoutCachedHeight =3960
+                End
+                Begin CommandButton
+                    TabStop = NotDefault
+                    OverlapFlags =85
+                    Left =4980
+                    Top =4620
+                    Width =3060
+                    TabIndex =10
+                    Name ="btnCleanStart"
+                    Caption ="Clean Start"
+                    StatusBarText ="Update Database Encription"
+                    OnClick ="[Event Procedure]"
+                    ShortcutMenuBar ="Update Database Encription"
+
+                    LayoutCachedLeft =4980
+                    LayoutCachedTop =4620
+                    LayoutCachedWidth =8040
+                    LayoutCachedHeight =4980
                 End
             End
         End

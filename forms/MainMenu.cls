@@ -132,6 +132,34 @@ errRedoUserCrypt_Click:
     Resume doneRedoUserCrypt_Click
 End Sub
 
+Private Sub btnCleanStart_Click()
+    On Error GoTo errbtnCleanStart_Click
+    If MsgBox("Update Database Encription!" & vbCrLf & vbCrLf & _
+              "This will remove all user" & vbCrLf & _
+              "login information stored on" & vbCrLf & _
+              "the SQL server " & Form_A.oAdm.DatabaseName & vbCrLf & _
+              "Then delete the application keys", _
+              vbYesNo + vbDefaultButton2, "Confirm") = vbYes Then
+
+        If Form_A.CleanStart = SystemErrorEnum.Noerror Then
+            MsgBox "1) All user information has been removed from " & Form_A.oAdm.DatabaseName & "." & vbCrLf & _
+                   "2) Applications keys have been deleted." & vbCrLf & vbCrLf & _
+                   "Todo: Create a new book cipher for the application" & vbCrLf & vbCrLf & _
+                   "1) In the immediate window execute 'GenerateBookCipher' " & vbCrLf & _
+                   "2) Copy string into ClassAdm.AppKeyBookCipher property." & vbCrLf & _
+                   "3) Close Access the reopen the FE.", , "Status"
+        Else
+            MsgBox "Clean start failed", , "Status"
+        End If
+        Me.Refresh
+    End If
+donebtnCleanStart_Click:
+    Exit Sub
+errbtnCleanStart_Click:
+    Logger ModuleName & ".btnCleanStart_Click", , Err.Number, Err.Description
+    Resume donebtnCleanStart_Click
+End Sub
+
 '-------------
 ' Sub form uses to fill-in current user
 Public Property Let CurrentUserID(ByVal UserID As String)
