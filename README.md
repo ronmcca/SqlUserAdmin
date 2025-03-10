@@ -1,5 +1,10 @@
 # SqlUserAdmin
 
+Manange user database accounts on SQL Server from an Access FE. Using cached ODBC connection in Access emulating Active Directory single sign-on.
+
+See Utter Access post
+https://www.utteraccess.com/topics/2065854/posts/2826059# And https://www.utteraccess.com/topics/2066313/posts/2826203
+
 **ClassAdm** is the primary user admin class. 
 See comments in the module for setup of the server and front end.
 Hidden table **uSysVar** stores encrypted keys.
