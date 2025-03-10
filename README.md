@@ -2,14 +2,16 @@
 
 Manange user database accounts on SQL Server from an Access FE. Using cached ODBC connection in Access emulating Active Directory single sign-on.
 
+I have moved it to public as my first open source project and welcome feedback and suggestions, with the ulterior modive of improving the code for my production applications.  
+
 See Utter Access post
-https://www.utteraccess.com/topics/2065854/posts/2826059# And https://www.utteraccess.com/topics/2066313/posts/2826203
+https://www.utteraccess.com/topics/2065854/posts/2826059# And https://www.utteraccess.com/topics/2066313/posts/2826203 for early history on this project.
 
 **ClassAdm** is the primary user admin class. 
 See comments in the module for setup of the server and front end.
 Hidden table **uSysVar** stores encrypted keys.
 
-**ClassCrypt** is a class version of Gustav Brock's modBcript cryptography code. 
+**ClassCrypt** is a class version of Gustav Brock's modBcript cryptography code and is included for the sample code but is not part of the project. 
                   https://github.com/GustavBrock/VBA.Cryptography/blob/main/LICENSE
 
 The application uses the following functions 
