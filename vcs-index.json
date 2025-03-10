@@ -6,7 +6,7 @@
   "Items": {
     "MergeBuildDate": null,
     "FullBuildDate": "2025-03-07T19:09:05.000Z",
-    "ExportDate": "2025-03-10T14:42:01.000Z",
+    "ExportDate": "2025-03-10T17:07:28.000Z",
     "FullExportDate": "2025-03-07T19:04:37.000Z",
     "OptionsHash": "f7c78cc",
     "LastMergedCommit": "",
@@ -65,12 +65,12 @@
       },
       "Modules": {
         "ClassAdm.cls": {
-          "FileHash": "465a58b",
-          "ExportDate": "2025-03-10T14:42:00.000Z",
+          "FileHash": "302ddc9",
+          "ExportDate": "2025-03-10T17:07:28.000Z",
           "SourceModified": null,
-          "FilePropertiesHash": "7962aee",
+          "FilePropertiesHash": "ef67165",
           "ImportDate": "2025-03-07T19:09:02.000Z",
-          "OtherHash": "05eac98"
+          "OtherHash": "81e1305"
         },
         "ClassCrypt.cls": {
           "FileHash": "ea45492",

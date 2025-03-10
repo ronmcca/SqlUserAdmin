@@ -12,7 +12,11 @@ Option Explicit
 
 '------------------------------- ClassAdm -------------------------------
 ' (c) Ron McCarry, Pack Air, Inc
-' Manange User rights on the SQL Server
+' Manange user database accounts on SQL Server from an Access FE.
+' Using cached ODBC connection in Access emulating single sign-on.
+'
+' See: https://www.utteraccess.com/topics/2065854/posts/2826059#
+' See: https://www.utteraccess.com/topics/2066313/posts/2826203
 '
 ' Requires a reference to 'Microsoft ActiveX Data Objects 6.1 Library
 '
@@ -208,7 +212,7 @@ Private Const QryUpdateUSysVar As String = "PARAMETERS [KeyType] Long, [ctKeyVal
                                            "WHERE usysvar.[ID]=[KeyType]"
 ' Instance varables
 Private Type AdmType
-    ADODBConnection As ADODB.Connection ' Opened by Class_Initialize and closed by Class_Terminate
+    ADODBConnection As ADODB.Connection ' Opened by 1st SQL request and closed by Class_Terminate
 
     LoggerFunctionName As String        ' Handle error logging
     Cryptography As ClassCrypt          ' Uses Decrypt, Encrypt, Hash, Random, RandomInt
