@@ -5,7 +5,7 @@ VCS Version 4.1.0
 Full Path: C:\PAI\Dev\SqlUserAdmin\SqlUserAdmin.accdb
 Export Folder: C:\PAI\Dev\SqlUserAdmin\SqlUserAdmin.accdb.src\
 Using Fast Save
-3/10/25 12:07:28 PM
+3/10/25 3:00:16 PM
 -------------------------------------
 Scanning external databases...
  - JobCost
@@ -33,7 +33,6 @@ No modified db properties found in this database.
 No modified imex specs found in this database.
 No modified tables found in this database.
 No modified queries found in this database.
-No modified forms found in this database.
 No modified macros found in this database.
 No modified reports found in this database.
 No modified table data macros found in this database.
@@ -46,33 +45,38 @@ Exporting modules...
   ClassAdm
 [1]
 -------------------------------------
+Exporting forms...            
+  A
+    Sanitized in 0.006 seconds.
+[1]
+-------------------------------------
 Exporting table data...       
   feUser
-    Sanitized in 0.002 seconds.
+    Sanitized in 0.001 seconds.
   USysVar
     Sanitized in 0.001 seconds.
 [2]
 -------------------------------------
-Done. (0.66 seconds)
+Done. (1.92 seconds)
 
 --------------------------------------------------
                 PERFORMANCE REPORTS
 --------------------------------------------------
 Category                      Count     Seconds
 --------------------------------------------------
+Forms                         1         1.28
 DB Properties                 0         0.15
 Table Data                    2         0.10
 Modules                       1         0.06
 Nav Pane Groups               0         0.03
-VBE References                0         0.03
+VBE References                0         0.02
 Doc Properties                0         0.02
-CommandBars                   0         0.02
 DB Connections                0         0.02
+CommandBars                   0         0.02
 Hidden Attributes             0         0.01
-Forms                         0         0.01
+Proj Properties               0         0.01
 Tables                        0         0.01
 VB Project                    0         0.01
-Proj Properties               0         0.01
 Themes                        0         0.01
 Project                       0         0.01
 Shared Images                 0         0.00
@@ -80,46 +84,49 @@ Table Data Macros             0         0.00
 Relations                     0         0.00
 IMEX Specs                    0         0.00
 VBE Forms                     0         0.00
-Queries                       0         0.00
-Macros                        0         0.00
 Saved Specs                   0         0.00
 Reports                       0         0.00
+Queries                       0         0.00
+Macros                        0         0.00
 --------------------------------------------------
-TOTALS:                       3         0.51
+TOTALS:                       4         1.77
 --------------------------------------------------
 
 --------------------------------------------------
 Operations                    Count     Seconds
 --------------------------------------------------
-Convert to JSON               562       0.24
-Scan DB Objects               1         0.11
+Convert to JSON               596       0.25
+Scan DB Objects               1         0.10
 App.ExportXML()               2         0.06
-Increment Progress            22        0.04
+Increment Progress            24        0.05
+Console Updates               4         0.04
 Clear Orphaned Files          14        0.04
-Console Updates               3         0.03
+App.SaveAsText()              1         0.01
 Export VBE Module             1         0.01
-Quick Count Files             1         0.01
 Get VBA Hash                  7         0.01
+Quick Count Files             1         0.01
+Sanitize File                 1         0.01
+Write File                    5         0.00
+Compute SHA256                33        0.00
 Quick Count Objects           1         0.00
 Parse JSON                    1         0.00
-Compute SHA256                28        0.00
+Delete File                   6         0.00
+Sanitize VBA Code             2         0.00
+Get File Property Hash        4         0.00
 Check for linked table        4         0.00
-Write File                    3         0.00
-Sanitize XML                  2         0.00
-Delete File                   4         0.00
-Sanitize VBA Code             1         0.00
+Read File                     5         0.00
+Read File DevMode             1         0.00
+modFileAccess.VerifyPath      8         0.00
 Scan External Databases       1         0.00
 Parse JSON ISO Date           33        0.00
-Get File Property Hash        2         0.00
-Read File                     4         0.00
-modFileAccess.VerifyPath      5         0.00
-Read File Bytes               3         0.00
+Sanitize XML                  2         0.00
+Read File Bytes               4         0.00
 Close Open Objects            1         0.00
 Format XML                    2         0.00
+Get Modified Date             4         0.00
 modFileAccess.GetUncPath      2         0.00
-Get Modified Date             2         0.00
 --------------------------------------------------
-Other Operations                        0.09
+Other Operations                        1.30
 --------------------------------------------------
 
 

@@ -11,10 +11,12 @@ Option Compare Database
 Option Explicit
 
 '------------------------------- ClassAdm -------------------------------
-' (c) Ron McCarry, Pack Air, Inc
-' Manange user database accounts on SQL Server from an Access FE.
+' Manage user database accounts on SQL Server from an Access FE.
 ' Using cached ODBC connection in Access emulating single sign-on.
 '
+' See: https://github.com/ronmcca/SqlUserAdmin/releases
+'
+' For early history
 ' See: https://www.utteraccess.com/topics/2065854/posts/2826059#
 ' See: https://www.utteraccess.com/topics/2066313/posts/2826203
 '
@@ -26,10 +28,11 @@ Option Explicit
 ' Optional logging function otherwise debug.print for logging.
 ' See LoggerFunctionName property.
 '
-' (c) Ron McCarry, Pack Air, Inc
-' Please feel free to use this code
-' without restriction in any application you develop.
-' Keep this copyright notice with this code.
+'--------------------------------------------------------------------------
+' Copyright (c) 2025 Ron McCarry/Pack Air Inc.
+' License for this module is MIT, see
+' https://github.com/ronmcca/SqlUserAdmin/blob/Dev/License.txt
+' Please keep this copyright notice with this code.
 '--------------------------------------------------------------------------
 
 Private Const ModuleName As String = "ClassAdm"
@@ -86,7 +89,8 @@ Private Const ModuleName As String = "ClassAdm"
 ' 5) (Optional) Add sample table sVar
 '   a. See CreateSampleSVar.text edit database name
 '
-' Setup FE
+'--------------------------------------------------------------------------
+' Setup Access FE
 ' The encripted application keys are stored in USysVar, normally not visable in the object viewer.
 ' 1) Open the "USysVar" table in the FE
 '   a. Delete the data NOT the records
@@ -112,14 +116,17 @@ Private Const ModuleName As String = "ClassAdm"
 '   a. Open the "A" form. (as reference)
 '   b. Your account should now be logged into the server.
 '
+'--------------------------------------------------------------------------
 ' Distribute complied version of FE to your users.
 '
+'--------------------------------------------------------------------------
 ' Update all encription keys without changing the book cipher
 ' 1) Open the "A" form. (as reference)
 ' 2) Click the "Update Database Encription"
 '    button on the "MainMenu" form. (as Referece)
 '   a. If it errors, goto Fresh start
 '
+'--------------------------------------------------------------------------
 ' Fresh start
 ' 1) Open the "A" form and remove all users
 '   a. If problem
