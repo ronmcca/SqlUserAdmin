@@ -1,24 +1,24 @@
 # SqlUserAdmin
 
-Manange user database accounts on SQL Server from an Access FE. Using cached ODBC connection in Access emulating Active Directory single sign-on.
+Manage user database accounts on SQL Server from an Access FE. Using cached ODBC connection in Access emulating Active Directory single sign-on.
 
-See Utter Access post
-https://www.utteraccess.com/topics/2065854/posts/2826059# And https://www.utteraccess.com/topics/2066313/posts/2826203
+I made this repository public as my first open-source project, hoping it will be of use and as a small give back, with the ulterior motive of improving the code for my production applications. I welcome  all feedback and suggestions.    
 
-**ClassAdm** is the primary user admin class. 
-See comments in the module for setup of the server and front end.
-Hidden table **uSysVar** stores encrypted keys.
+See Utter Access post.
+https://www.utteraccess.com/topics/2065854/posts/2826059# And https://www.utteraccess.com/topics/2066313/posts/2826203 for early history on this project. You will see per suggestion; I replace my very weak cryptography with Gustav Brock's much improved system and moved the 1st ODBC connection inside the ClassAdm.
 
-**ClassCrypt** is a class version of Gustav Brock's modBcript cryptography code. 
-                  https://github.com/GustavBrock/VBA.Cryptography/blob/main/LICENSE
+**ClassAdm** is the project's primary object; handling user administration while creating the cached ODBC connection. It uses the hidden table **uSysVar** to store encrypted keys. 
+See comments in the class module for setup instructions for the SQL server and Access front end.
+The class requires a cryptography class, using the following functions **Decrypt**, **Encrypt**, **Hash**, **Random**, **RandomInt**. 
 
-The application uses the following functions 
-**Decrypt**, **Encrypt**, **Hash**, **Random**, **RandomInt**. 
-Supply these functions if you replace this cryptography with something else.
+The **SQLAdmSample** folder has SQL server scripts to build the sample database and a backup of my sample database.
 
-Sample objects
+**ClassCrypt** is a class version of Gustav Brock's BCript cryptography code included for the sample code but is not part of the project. 
+                  (https://github.com/GustavBrock/VBA.Cryptography). You are free to supply your own class with compatible definitions. 
+                  
+Sample code objects.
 
-**sysVar** is a sample linked table to the server containing 1 record indicating Test or Production database.
+**sysVar** is a sample linked table to the server containing one record indicating Test or Production database.
 
 **feUser** is a sample application user list.
 

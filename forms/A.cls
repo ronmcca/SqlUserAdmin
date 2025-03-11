@@ -51,12 +51,12 @@ Private Type SystemForm
     SQLUserType As AdmUserTypeEnum ' Type of user account, SQLNone if failed to login
 
     rsUserList As DAO.Recordset    ' Opened and closed by UpdateUserKeys and AddUserList
-    ProjectName As String
+    ProjectName As String          ' Passed as part of the logger function name to clsAdm
 End Type
 Private This As SystemForm
 
 '---------------------------------
-Private WithEvents clsAdm As ClassAdm
+Private WithEvents clsAdm As ClassAdm  ' Not part of 'This' because of WithEvents
 Attribute clsAdm.VB_VarHelpID = -1
 '---------------------------------
 
@@ -442,7 +442,7 @@ errAddUser:
 End Function
 
 '----------------
-' Update database keys
+' Add list of users to SQL Server
 Public Function AddUserList() As SystemErrorEnum
     On Error GoTo errAddUserList
     ClearLastError
@@ -516,7 +516,6 @@ End Function
 ' Clean start database
 ' Remove all applicaiton users from SQL server
 ' Erase all keys if all users were removed.
-'
 Public Function CleanStart() As SystemErrorEnum
     On Error GoTo errCleanStart
     Dim UserID As String
