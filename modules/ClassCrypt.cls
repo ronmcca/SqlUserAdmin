@@ -11,9 +11,6 @@ Option Compare Binary  '*** Binary required for this code to work ***'
 Option Explicit
 
 '------------------------------- ClassBCrypt -------------------------------
-' Manange User rights on the SQL Server
-'
-' Requires a reference to 'Microsoft ActiveX Data Objects 6.1 Library
 
 Private Const ModuleName As String = "ClassBCrypt"
 
@@ -207,6 +204,40 @@ Public Enum cBcHashAlgorithm
 End Enum
 
 ' Allowed BCrypt random algorithms.
+' https://learn.microsoft.com/en-us/windows/win32/SecCNG/cng-algorithm-identifiers
+' Per Gustav Brock post on 1-8-26
+'   https://www.access-programmers.co.uk/forums/threads/simple-password-strength-checker-with-pwned-online-check.334790/page-2#post-1984094
+'   The random generator by default uses the RNG algorithm value;
+'   FIPS186DSARNG is optional and not used anywhere in the library,
+'   only included to tell that the function could be used for something else,
+'   and the included Random function is for demonstration only.
+'
+'   FIPS 186 DSA RNG has been deprecated since February 2023 for
+'   general random number generation and should not be used. Instead, a NIST-approved DRBG such as those implemented in CNG should be used. Those do not incluce ECDSA which is recommended for signatures, not for RNG.
+'   So, use BCryptGenRandom with BCRYPT_RNG_ALGORITHM (literal "RNG") for salts, nonces, and general randomness.
+'
+'   If you (the system, the workstation) must be FIPS compliant, this is an additional step that must be done separately:
+'
+'   Group policy:
+'       Computer Configuration, Windows Settings, Security Settings, Local Policies, Security Options
+'       Enable:
+'       System cryptography: Use FIPS compliant algorithms for encryption, hashing, and signing
+'
+'   Registry:
+'       HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\FipsAlgorithmPolicy
+'       Enabled = 1
+'
+'   However, enabling FIPS mode is not just a registry tweak,
+'            it changes the cryptographic behavior system-wide. There are potential drawbacks:
+'   Performance impact: Some FIPS-approved algorithms are slower than non-FIPS equivalents.
+'   Compatibility issues:
+'           Applications that use non-FIPS algorithms (e.g., MD5, SHA-1 in non-compliant ways, or RC4) may fail or throw exceptions.
+'           .NET applications using System.Security.Cryptography can break if they rely on non-FIPS algorithms.
+'   User experience:
+'           Certain features in apps (like older VPN clients, RDP, or legacy software) may stop working.
+'           Some browsers or TLS stacks might restrict cipher suites.
+'    If FIPS mode is off, BCryptGenRandom still uses a strong cryptographic RNG, but it may not be strictly FIPS-validated.
+'    This is fine for general security, but not for formal FIPS compliance.
 Public Enum cBcRandomAlgorithm
     [_First] = 1
     bcRng = 1
